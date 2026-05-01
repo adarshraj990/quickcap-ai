@@ -303,6 +303,9 @@ export default function Home() {
                     <button onClick={handleReset} className="mt-5 text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-white transition-colors border border-red-500/30">
                       Try Again
                     </button>
+                    <p className="mt-4 text-[10px] text-red-400 opacity-70 italic">
+                      Reminder: Ensure GROQ_API_KEY is set in your Vercel Dashboard.
+                    </p>
                   </div>
                 </div>
               )}
