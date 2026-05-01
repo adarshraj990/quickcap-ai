@@ -1,0 +1,120 @@
+import { NextRequest, NextResponse } from "next/server";
+import Groq from "groq-sdk";
+
+export async function POST(req: NextRequest) {
+  const DEBUG_ID = "v2_HINGLISH_ACTIVE";
+  try {
+    console.log(`[${DEBUG_ID}] Transcription request received.`);
+    
+    if (!process.env.GROQ_API_KEY) {
+      return NextResponse.json({ error: "API KEY MISSING IN ENV" }, { status: 500 });
+    }
+
+    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+    const formData = await req.formData();
+    const audioFile = formData.get("audio") as File | null;
+    const selectedLanguage = formData.get("language") as string || "auto";
+
+    if (!audioFile) {
+      console.log(`[${DEBUG_ID}] Error: No audio file provided`);
+      return NextResponse.json({ error: "No audio file provided" }, { status: 400 });
+    }
+
+    console.log(`[${DEBUG_ID}] Sending to Groq (Whisper-large-v3). Size: ${audioFile.size} bytes. Language: ${selectedLanguage}`);
+
+    let whisperParams: any = {
+      file: audioFile,
+      model: "whisper-large-v3",
+      response_format: "verbose_json",
+      timestamp_granularities: ["segment"],
+      temperature: 0.1, // Slight flexibility prevents "stuck" gibberish loops
+    };
+
+    // Configure language and prompt dynamically based on user selection
+    if (selectedLanguage === "hinglish") {
+      whisperParams.language = "en"; 
+      // Conversational examples prevent "Prompt Leakage"
+      whisperParams.prompt = "Namaste dosto, kaise hain aap sab? Aaj ke is video mein hum baat karenge. I hope aapko ye pasand aayega. Kya haal hai? All good.";
+    } else if (selectedLanguage !== "auto") {
+      whisperParams.language = selectedLanguage;
+      whisperParams.prompt = "This is a high-quality transcription of a professional video recording. Capture every word accurately.";
+    } else {
+      whisperParams.prompt = "Hello, welcome. Namaste, swagat hai. Bonjour, bienvenue. Every word is captured exactly as spoken.";
+    }
+
+    const transcription = await groq.audio.transcriptions.create(whisperParams);
+
+    let finalSegments = (transcription as any).segments || [];
+
+    // ── Translation Pass (Optional) ──────────────────────────
+    const isTranslateEnabled = formData.get("translate") === "true";
+    const targetLanguage = formData.get("targetLanguage") as string || "en";
+
+    if (isTranslateEnabled && finalSegments.length > 0) {
+      console.log(`[${DEBUG_ID}] Translation enabled. Target: ${targetLanguage}`);
+      
+      const segmentsToTranslate = finalSegments.map((s: any) => ({
+        id: s.id,
+        text: s.text
+      }));
+
+      const chatCompletion = await groq.chat.completions.create({
+        messages: [
+          {
+            role: "system",
+            content: `You are a professional translator. Translate the following transcription segments into the language with code: ${targetLanguage}. 
+            Return ONLY a valid JSON array of objects with the keys "id" and "text". 
+            Do not include any explanation or extra text. 
+            Maintain the exact IDs.`,
+          },
+          {
+            role: "user",
+            content: JSON.stringify(segmentsToTranslate),
+          },
+        ],
+        model: "llama-3.3-70b-versatile",
+        response_format: { type: "json_object" },
+      });
+
+      try {
+        const responseText = chatCompletion.choices[0]?.message?.content || "{}";
+        const translatedData = JSON.parse(responseText);
+        const translatedSegments = Array.isArray(translatedData) ? translatedData : translatedData.segments || [];
+
+        // Map translations back to original segments with timestamps
+        finalSegments = finalSegments.map((original: any) => {
+          const translation = translatedSegments.find((t: any) => t.id === original.id);
+          return {
+            ...original,
+            text: translation ? translation.text : original.text
+          };
+        });
+        
+        console.log(`[${DEBUG_ID}] Translation complete.`);
+      } catch (err) {
+        console.error(`[${DEBUG_ID}] Translation parsing error:`, err);
+      }
+    }
+
+    const firstWords = (transcription as any).text?.substring(0, 200) || "No text";
+    console.log(`[${DEBUG_ID}] Returning results. Segments: ${finalSegments.length}. Text preview: ${firstWords}`);
+    
+    return NextResponse.json({ 
+      transcription: { 
+        ...transcription,
+        segments: finalSegments 
+      }, 
+      debugId: DEBUG_ID 
+    });
+  } catch (error: any) {
+    console.error(`[${DEBUG_ID}] Error:`, error);
+    const msg = error.message || "Unknown error";
+    const code = error.status || 500;
+    
+    // IF THE USER SEES THIS, THEY ARE ON THE NEW CODE
+    return NextResponse.json({ 
+      error: `QuickCap AI Error [${DEBUG_ID}]: ${msg}`, 
+      status: code 
+    }, { status: code });
+  }
+}
