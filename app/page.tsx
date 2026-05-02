@@ -15,7 +15,7 @@ import {
 import { DropZone } from "@/components/DropZone";
 import { ProgressBar } from "@/components/ProgressBar";
 import { CaptionList } from "@/components/CaptionList";
-import { extractAudioDynamic } from "@/lib/ffmpeg-utils";
+import { extractAudioDynamic, CHUNK_DURATION } from "@/lib/ffmpeg-utils";
 import { type Segment, formatBytes } from "@/lib/utils";
 
 type AppState = "idle" | "extracting" | "transcribing" | "done" | "error";
@@ -48,7 +48,7 @@ export default function Home() {
   const [selectedLanguage, setSelectedLanguage] = useState("hinglish");
   const [isTranslateEnabled, setIsTranslateEnabled] = useState(false);
   const [targetLanguage, setTargetLanguage] = useState("en");
-  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [mediaFile, setMediaFile] = useState<File | null>(null);
   const [segments, setSegments] = useState<Segment[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState<ProgressState>({
@@ -62,14 +62,14 @@ export default function Home() {
   } | null>(null);
 
   const handleFileSelect = useCallback((file: File) => {
-    setVideoFile(file);
+    setMediaFile(file);
     setError(null);
     setSegments([]);
     setAudioStats(null);
   }, []);
 
   const handleProcess = useCallback(async () => {
-    if (!videoFile) return;
+    if (!mediaFile) return;
 
     try {
       setError(null);
@@ -77,28 +77,44 @@ export default function Home() {
         throw new Error("SharedArrayBuffer is disabled. Please use a modern browser on a secure connection.");
       }
 
+      // STEP 1: Loading Engine
       setAppState("extracting");
+      setProgress({ stage: "Step 1: Loading processing engine...", extractProgress: 10, transcribeProgress: 0 });
+
+      // STEP 2: Local Extraction
       const { chunks, originalSize, compressedSize } = await extractAudioDynamic(
-        videoFile,
-        (stage, p) => setProgress((prev) => ({ ...prev, stage, extractProgress: p }))
+        mediaFile,
+        (stage, p) => setProgress((prev) => ({ 
+          ...prev, 
+          stage: `Step 2: Extracting audio from video (Local)... ${p}%`, 
+          extractProgress: p 
+        }))
       );
       setAudioStats({ originalSize, compressedSize });
 
+      // LOGGING FOR VERIFICATION
+      console.log(`[VERIFICATION] Original Video Size: ${(originalSize / (1024 * 1024)).toFixed(2)} MB`);
+      console.log(`[VERIFICATION] Total Extracted Audio Size: ${(compressedSize / 1024).toFixed(2)} KB`);
+
+      // STEP 3: Uploading & Transcribing
       setAppState("transcribing");
       const allSegments: Segment[] = [];
       let globalIdCounter = 0;
-      const CHUNK_DURATION = 2700;
 
       for (let i = 0; i < chunks.length; i++) {
         const { audioBlob, index } = chunks[i];
+        
+        // Log individual chunk for verification
+        console.log(`[VERIFICATION] Sending Chunk ${i+1}. MIME Type: ${audioBlob.type}. Size: ${(audioBlob.size / 1024).toFixed(2)} KB`);
+
         setProgress((prev) => ({
           ...prev,
-          stage: `AI Transcribing Part ${i + 1}/${chunks.length}...`,
+          stage: `Step 3: Uploading audio for transcription (Part ${i + 1}/${chunks.length})...`,
           transcribeProgress: Math.round((i / chunks.length) * 100),
         }));
 
         const formData = new FormData();
-        formData.append("audio", audioBlob, "audio.mp3");
+        formData.append("file", audioBlob, "audio.mp3"); // Using 'file' key as per strict requirement
         formData.append("language", selectedLanguage);
         formData.append("translate", isTranslateEnabled.toString());
         formData.append("targetLanguage", targetLanguage);
@@ -125,11 +141,11 @@ export default function Home() {
       setError(err.message);
       setAppState("error");
     }
-  }, [videoFile, selectedLanguage, isTranslateEnabled, targetLanguage]);
+  }, [mediaFile, selectedLanguage, isTranslateEnabled, targetLanguage]);
 
   const handleReset = useCallback(() => {
     setAppState("idle");
-    setVideoFile(null);
+    setMediaFile(null);
     setSegments([]);
     setError(null);
     setAudioStats(null);
@@ -174,14 +190,14 @@ export default function Home() {
               )}
 
               {/* Settings Block */}
-              {videoFile && !isProcessing && appState !== "done" && (
+              {mediaFile && !isProcessing && appState !== "done" && (
                 <div className="glass-premium p-8 rounded-3xl space-y-8 animate-fade-up shadow-[0_0_50px_rgba(139,92,246,0.1)] border border-white/10 relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-32 h-32 bg-violet-500/20 blur-[50px] pointer-events-none rounded-full" />
                   
                   {/* Language Selector */}
                   <div className="space-y-3 relative z-10">
                     <label className="text-xs font-bold uppercase tracking-widest text-slate-300 flex items-center gap-2">
-                      <Globe className="w-4 h-4 text-violet-400" /> Video Language
+                      <Globe className="w-4 h-4 text-violet-400" /> Media Language
                     </label>
                     <select
                       value={selectedLanguage}
@@ -282,7 +298,7 @@ export default function Home() {
                      </div>
                   </div>
                   <ProgressBar
-                    label="Local Audio Extraction"
+                    label="Local Media Processing"
                     progress={progress.extractProgress}
                     color={appState === "extracting" ? "secondary" : "success"}
                   />
@@ -319,7 +335,7 @@ export default function Home() {
             <div className="lg:col-span-8 animate-fade-up" style={{ animationDelay: "0.2s" }}>
               <CaptionList 
                 segments={segments} 
-                videoFile={videoFile!} 
+                mediaFile={mediaFile!} 
                 onUpdateSegments={setSegments} 
               />
             </div>

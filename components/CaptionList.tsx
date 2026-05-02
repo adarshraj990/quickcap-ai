@@ -1,23 +1,24 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useMemo } from "react";
-import { Download, Copy, Check, Clock } from "lucide-react";
+import { Download, Copy, Check, Clock, Music } from "lucide-react";
 import { type Segment, segmentsToSrt, downloadFile, secondsToSrtTimestamp, formatDuration } from "@/lib/utils";
 
 interface CaptionListProps {
   segments: Segment[];
-  videoFile: File;
+  mediaFile: File;
   onUpdateSegments: (segments: Segment[]) => void;
 }
 
-export function CaptionList({ segments, videoFile, onUpdateSegments }: CaptionListProps) {
+export function CaptionList({ segments, mediaFile, onUpdateSegments }: CaptionListProps) {
   const [copied, setCopied] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   
-  const videoUrl = useMemo(() => URL.createObjectURL(videoFile), [videoFile]);
+  const videoUrl = useMemo(() => URL.createObjectURL(mediaFile), [mediaFile]);
+  const isAudio = mediaFile.type.startsWith("audio/");
 
   useEffect(() => {
     return () => URL.revokeObjectURL(videoUrl);
@@ -44,7 +45,7 @@ export function CaptionList({ segments, videoFile, onUpdateSegments }: CaptionLi
 
   const handleDownloadSrt = () => {
     const srtContent = segmentsToSrt(segments);
-    const cleanBaseName = videoFile.name.replace(/\.[^/.]+$/, "").replace(/[\\/:*?"<>|]/g, "_");
+    const cleanBaseName = mediaFile.name.replace(/\.[^/.]+$/, "").replace(/[\\/:*?"<>|]/g, "_");
     downloadFile(srtContent, `${cleanBaseName}.srt`, "text/srt");
   };
 
@@ -72,15 +73,35 @@ export function CaptionList({ segments, videoFile, onUpdateSegments }: CaptionLi
   return (
     <div className="w-full space-y-6">
       
-      {/* Video Player */}
+      {/* Media Player */}
       <div className="rounded-3xl overflow-hidden bg-slate-900 border border-white/10 relative shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-        <video
-          ref={videoRef}
-          src={videoUrl}
-          controls
-          className="w-full h-auto max-h-[400px] object-contain"
-          onTimeUpdate={handleTimeUpdate}
-        />
+        {isAudio ? (
+          <div className="flex flex-col items-center justify-center py-16 px-8 bg-gradient-to-br from-slate-900 to-indigo-950 relative overflow-hidden group">
+            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20" />
+            <div className="w-24 h-24 rounded-full bg-cyan-500/10 flex items-center justify-center border border-cyan-500/20 shadow-[0_0_50px_rgba(6,182,212,0.15)] animate-float mb-8 relative z-10 group-hover:scale-110 transition-transform duration-500">
+               <Music className="w-12 h-12 text-cyan-400" />
+            </div>
+            <div className="text-center mb-10 relative z-10">
+              <p className="text-lg font-black text-white tracking-tight">{mediaFile.name}</p>
+              <p className="text-xs font-bold text-cyan-400/70 uppercase tracking-[0.3em] mt-2">Audio Processing Mode</p>
+            </div>
+            <audio
+              ref={videoRef as any}
+              src={videoUrl}
+              controls
+              className="w-full max-w-xl h-10 opacity-80 hover:opacity-100 transition-opacity z-10"
+              onTimeUpdate={handleTimeUpdate}
+            />
+          </div>
+        ) : (
+          <video
+            ref={videoRef}
+            src={videoUrl}
+            controls
+            className="w-full h-auto max-h-[400px] object-contain"
+            onTimeUpdate={handleTimeUpdate}
+          />
+        )}
       </div>
 
       {/* Header */}

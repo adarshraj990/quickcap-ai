@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import Groq from "groq-sdk";
 
+export const maxDuration = 60; // Increase timeout to 60 seconds for long transcriptions
+
 export async function POST(req: NextRequest) {
   const DEBUG_ID = "v2_HINGLISH_ACTIVE";
   try {
@@ -12,7 +14,7 @@ export async function POST(req: NextRequest) {
 
     const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
     const formData = await req.formData();
-    const audioFile = formData.get("audio") as File | null;
+    const audioFile = formData.get("file") as File | null;
     const selectedLanguage = formData.get("language") as string || "auto";
 
     if (!audioFile) {

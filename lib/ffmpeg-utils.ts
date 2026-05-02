@@ -49,101 +49,111 @@ export interface ExtractionResult {
   compressedSize: number;
 }
 
-export async function getVideoDuration(file: File): Promise<number> {
+export async function getMediaDuration(file: File): Promise<number> {
+  const isAudio = file.type.startsWith("audio/");
   return new Promise((resolve) => {
-    const video = document.createElement("video");
-    video.preload = "metadata";
-    video.onloadedmetadata = () => {
-      window.URL.revokeObjectURL(video.src);
-      resolve(video.duration);
+    const media = document.createElement(isAudio ? "audio" : "video");
+    media.preload = "metadata";
+    media.onloadedmetadata = () => {
+      window.URL.revokeObjectURL(media.src);
+      resolve(media.duration);
     };
-    video.onerror = () => {
+    media.onerror = () => {
       resolve(0); // Fallback if format unsupported
     };
-    video.src = URL.createObjectURL(file);
+    media.src = URL.createObjectURL(file);
   });
 }
 
+export const CHUNK_DURATION = 600; // 10 minutes segments for stability
+
 /**
- * TOTAL REWRITE: High-Fidelity Audio Extraction
- * Prioritizes uncompressed WAV for maximum AI accuracy.
+ * TOTAL REWRITE: High-Fidelity Audio Extraction with Chunking
+ * Ensures we stay under Groq's 25MB limit by splitting long audio.
  */
 export async function extractAudioDynamic(
-  videoFile: File,
+  mediaFile: File,
   onProgress: (stage: string, progress: number) => void
 ): Promise<ExtractionResult> {
-  onProgress("Analyzing high-fidelity requirements...", 0);
+  onProgress("Analyzing requirements...", 0);
   
-  const duration = await getVideoDuration(videoFile);
-  const MAX_BYTES = 24 * 1024 * 1024; // 24MB
+  const duration = await getMediaDuration(mediaFile);
+  const isAudioInput = mediaFile.type.startsWith("audio/");
   
-  // WAV (pcm_s16le, 16k, mono) is ~32KB/sec.
-  // 32KB * 60 = 1.92MB per minute.
-  // 24MB / 1.92MB = ~12.5 minutes.
-  
-  let format = "wav";
-  let codec = "pcm_s16le";
   let extension = "wav";
-  let bitrate = "";
+  let codec = "pcm_s16le";
+  let format = "wav";
 
-  if (duration > 750) { // > 12.5 minutes
-    format = "flac"; // Lossless compression
-    extension = "flac";
-    codec = "flac";
-  }
-  
-  if (duration > 1800) { // > 30 minutes (FLAC might exceed 25MB)
-    format = "mp3";
+  if (duration > CHUNK_DURATION) {
     extension = "mp3";
     codec = "libmp3lame";
-    bitrate = "192k"; // Still very high quality
+    format = "mp3";
   }
 
-  console.log(`Video duration: ${duration}s. Strategy: ${format.toUpperCase()} ${bitrate}`);
+  console.log(`Media duration: ${duration}s. Strategy: ${format.toUpperCase()} Chunking`);
 
   const ffmpeg = await getFFmpeg((progress) => {
-    onProgress(`[2/3] Extracting ${format.toUpperCase()} Audio...`, Math.round(progress * 80));
+    onProgress(`[2/3] Processing ${isAudioInput ? 'Audio' : 'Video'}...`, Math.round(progress * 80));
   });
 
-  const inputName = "input.mp4";
-  const outputName = `output.${extension}`;
-  await ffmpeg.writeFile(inputName, await fetchFile(videoFile));
+  const inputName = "input_file";
+  await ffmpeg.writeFile(inputName, await fetchFile(mediaFile));
 
+  // Use segment muxer for automatic chunking
   const ffmpegArgs = [
     "-i", inputName,
     "-vn",                   
     "-ac", "1",              
-    "-ar", "44100", // Increased to 44.1k for maximum fidelity
-    "-af", "loudnorm=I=-16:TP=-1.5:LRA=11", // Professional EBU R128 normalization
+    "-ar", "16000", // Standard for AI transcription
+    "-af", "loudnorm=I=-16:TP=-1.5:LRA=11", // Normalization
+    "-c:a", codec,
   ];
 
-  if (bitrate) {
-    ffmpegArgs.push("-b:a", bitrate);
+  if (format === "mp3") {
+    ffmpegArgs.push("-b:a", "128k");
   }
-  
-  ffmpegArgs.push("-f", format, outputName);
 
-  onProgress(`Extracting Pristine Audio (${format.toUpperCase()})...`, 15);
+  ffmpegArgs.push(
+    "-f", "segment",
+    "-segment_time", CHUNK_DURATION.toString(),
+    `output_%03d.${extension}`
+  );
+
+  onProgress(`${isAudioInput ? 'Optimizing' : 'Extracting'} Audio (${format.toUpperCase()})...`, 15);
   await ffmpeg.exec(ffmpegArgs);
 
-  onProgress("Finalizing...", 90);
+  onProgress("Reading chunks...", 90);
 
-  const data = await ffmpeg.readFile(outputName);
-  if (typeof data === "string") throw new Error("FFmpeg output was unexpectedly a string.");
-  
-  // Clean copy to regular ArrayBuffer
-  const regularBuffer = new ArrayBuffer(data.byteLength);
-  new Uint8Array(regularBuffer).set(data);
-  const audioBlob = new Blob([regularBuffer], { type: `audio/${extension}` });
+  const chunks: ChunkResult[] = [];
+  const numChunks = Math.ceil(duration / CHUNK_DURATION);
+  let totalCompressedSize = 0;
+
+  for (let i = 0; i < numChunks; i++) {
+    const chunkName = `output_${i.toString().padStart(3, "0")}.${extension}`;
+    try {
+      const data = await ffmpeg.readFile(chunkName);
+      if (typeof data === "string") continue;
+      
+      const regularBuffer = new ArrayBuffer(data.byteLength);
+      new Uint8Array(regularBuffer).set(data);
+      const audioBlob = new Blob([regularBuffer], { type: `audio/${extension}` });
+      
+      chunks.push({ audioBlob, index: i });
+      totalCompressedSize += audioBlob.size;
+      
+      await ffmpeg.deleteFile(chunkName);
+    } catch (e) {
+      console.warn(`Could not read chunk ${i}, might be empty or duration mismatch.`);
+    }
+  }
 
   await ffmpeg.deleteFile(inputName);
-  await ffmpeg.deleteFile(outputName);
 
-  onProgress("Done extracting!", 100);
+  onProgress("Done processing!", 100);
 
   return {
-    chunks: [{ audioBlob, index: 0 }],
-    originalSize: videoFile.size,
-    compressedSize: audioBlob.size,
+    chunks,
+    originalSize: mediaFile.size,
+    compressedSize: totalCompressedSize,
   };
 }

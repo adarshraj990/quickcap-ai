@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useState, useRef } from "react";
-import { UploadCloud, Film, X } from "lucide-react";
+import { UploadCloud, Film, X, Music } from "lucide-react";
 import { formatBytes } from "@/lib/utils";
 
 interface DropZoneProps {
@@ -9,7 +9,10 @@ interface DropZoneProps {
   disabled?: boolean;
 }
 
-const ACCEPTED_TYPES = ["video/mp4", "video/webm", "video/ogg", "video/quicktime", "video/x-msvideo", "video/mpeg"];
+const ACCEPTED_TYPES = [
+  "video/mp4", "video/webm", "video/ogg", "video/quicktime", "video/x-msvideo", "video/mpeg",
+  "audio/mpeg", "audio/wav", "audio/ogg", "audio/mp3", "audio/x-m4a", "audio/flac"
+];
 const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500MB
 
 export function DropZone({ onFileSelect, disabled }: DropZoneProps) {
@@ -21,8 +24,11 @@ export function DropZone({ onFileSelect, disabled }: DropZoneProps) {
   const validateAndSelect = useCallback(
     (file: File) => {
       setError(null);
-      if (!ACCEPTED_TYPES.includes(file.type) && !file.name.match(/\.(mp4|webm|mov|avi|mkv|mpeg|ogv)$/i)) {
-        setError("Unsupported format. Please upload MP4, WebM, MOV, or AVI.");
+      const isAudio = file.type.startsWith("audio/");
+      const isVideo = file.type.startsWith("video/");
+
+      if (!ACCEPTED_TYPES.includes(file.type) && !file.name.match(/\.(mp4|webm|mov|avi|mkv|mpeg|mp3|wav|m4a|flac)$/i)) {
+        setError("Unsupported format. Please upload Video (MP4, MOV, etc.) or Audio (MP3, WAV, etc.).");
         return;
       }
       if (file.size > MAX_FILE_SIZE) {
@@ -68,6 +74,8 @@ export function DropZone({ onFileSelect, disabled }: DropZoneProps) {
     if (inputRef.current) inputRef.current.value = "";
   };
 
+  const isAudioFile = selectedFile?.type.startsWith("audio/");
+
   return (
     <div className="w-full space-y-4">
       <div
@@ -96,12 +104,12 @@ export function DropZone({ onFileSelect, disabled }: DropZoneProps) {
 
         {selectedFile ? (
           <div className="flex flex-col items-center gap-4 animate-fade-up z-10">
-            <div className="w-20 h-20 rounded-2xl flex items-center justify-center bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 border border-white/10 shadow-[0_0_30px_rgba(139,92,246,0.3)] animate-float">
-              <Film className="w-10 h-10 text-fuchsia-400" />
+            <div className={`w-20 h-20 rounded-2xl flex items-center justify-center bg-gradient-to-br border border-white/10 shadow-2xl animate-float ${isAudioFile ? 'from-cyan-500/20 to-blue-500/20 shadow-[0_0_30px_rgba(6,182,212,0.3)]' : 'from-violet-500/20 to-fuchsia-500/20 shadow-[0_0_30px_rgba(139,92,246,0.3)]'}`}>
+              {isAudioFile ? <Music className="w-10 h-10 text-cyan-400" /> : <Film className="w-10 h-10 text-fuchsia-400" />}
             </div>
             <div className="text-center">
               <p className="font-bold text-xl text-white truncate max-w-xs">{selectedFile.name}</p>
-              <p className="text-sm text-slate-400 font-medium mt-1">{formatBytes(selectedFile.size)}</p>
+              <p className="text-sm text-slate-400 font-medium mt-1 uppercase tracking-widest">{isAudioFile ? 'Audio File' : 'Video File'} • {formatBytes(selectedFile.size)}</p>
             </div>
             {!disabled && (
               <button
@@ -118,11 +126,11 @@ export function DropZone({ onFileSelect, disabled }: DropZoneProps) {
               <UploadCloud className="w-10 h-10 text-cyan-400 transition-colors" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-white mb-2">Drop your video here</p>
+              <p className="text-2xl font-bold text-white mb-2">Drop your video or audio</p>
               <p className="text-slate-400">or <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-400 font-bold hover:underline">browse files</span></p>
             </div>
             <div className="flex gap-2">
-              {["MP4", "MOV", "WEBM"].map((fmt) => (
+              {["MP4", "MP3", "WAV", "MOV"].map((fmt) => (
                 <span key={fmt} className="text-[10px] font-bold px-3 py-1 rounded-full bg-white/5 text-slate-400 border border-white/10">
                   {fmt}
                 </span>
@@ -131,7 +139,7 @@ export function DropZone({ onFileSelect, disabled }: DropZoneProps) {
           </div>
         )}
 
-        <input ref={inputRef} type="file" accept="video/*" className="hidden" onChange={onInputChange} disabled={disabled} />
+        <input ref={inputRef} type="file" accept="video/*,audio/*" className="hidden" onChange={onInputChange} disabled={disabled} />
       </div>
 
       {error && (
