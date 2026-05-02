@@ -7,8 +7,9 @@ export const metadata = {
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen bg-mesh relative py-24 px-6">
-      <div className="absolute inset-0 bg-black/40 pointer-events-none" />
+    <main className="min-h-screen relative py-24 px-6">
+      <div className="bg-mesh" />
+      <div className="absolute inset-0 bg-black/40 pointer-events-none z-0" />
       <div className="relative max-w-4xl mx-auto z-10 glass-premium rounded-3xl p-10 md:p-16 animate-fade-up border border-white/10 shadow-2xl">
         <h1 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400 mb-8">
           About QuickCap AI

@@ -139,8 +139,10 @@ export default function Home() {
   const isProcessing = appState === "extracting" || appState === "transcribing";
 
   return (
-    <main className="min-h-screen bg-mesh relative selection:bg-indigo-500/30">
-      <div className="absolute inset-0 bg-black/40 pointer-events-none" />
+    <main className="min-h-screen relative selection:bg-indigo-500/30">
+      {/* Stunning Background Layer */}
+      <div className="bg-mesh" />
+      <div className="absolute inset-0 bg-black/40 pointer-events-none z-0" />
       
       <div className="relative max-w-[1400px] mx-auto px-6 py-24 md:py-40 space-y-32 md:space-y-48 z-10">
         
