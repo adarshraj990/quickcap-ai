@@ -29,19 +29,21 @@ export async function POST(req: NextRequest) {
       model: "whisper-large-v3",
       response_format: "verbose_json",
       timestamp_granularities: ["segment"],
-      temperature: 0.1, // Slight flexibility prevents "stuck" gibberish loops
+      temperature: 0, // Deterministic output for maximum accuracy
     };
 
     // Configure language and prompt dynamically based on user selection
     if (selectedLanguage === "hinglish") {
       whisperParams.language = "en"; 
-      // Conversational examples prevent "Prompt Leakage"
-      whisperParams.prompt = "Namaste dosto, kaise hain aap sab? Aaj ke is video mein hum baat karenge. I hope aapko ye pasand aayega. Kya haal hai? All good.";
+      whisperParams.prompt = "This is a Hinglish video where people speak a mix of Hindi and English. Transcribe the Hindi parts in Roman script (e.g., 'kaise hain' instead of 'कैसे हैं'). Focus on conversational flow.";
+    } else if (selectedLanguage === "hi") {
+      whisperParams.language = "hi";
+      whisperParams.prompt = "यह एक हिंदी वीडियो है। कृपया इसे शुद्ध देवनागरी लिपि में ट्रांसक्राइब करें। विराम चिह्नों का सही प्रयोग करें।";
     } else if (selectedLanguage !== "auto") {
       whisperParams.language = selectedLanguage;
-      whisperParams.prompt = "This is a high-quality transcription of a professional video recording. Capture every word accurately.";
+      whisperParams.prompt = `This is a clear, professional transcription in ${selectedLanguage}. Maintain all technical terms and proper nouns.`;
     } else {
-      whisperParams.prompt = "Hello, welcome. Namaste, swagat hai. Bonjour, bienvenue. Every word is captured exactly as spoken.";
+      whisperParams.prompt = "Transcribe the audio accurately. If multiple languages are spoken, capture them as they are. Maintain punctuation and casing.";
     }
 
     const transcription = await groq.audio.transcriptions.create(whisperParams);

@@ -99,37 +99,37 @@ export async function extractAudioDynamic(
   const inputName = "input_file";
   await ffmpeg.writeFile(inputName, await fetchFile(mediaFile));
 
-  // Use segment muxer for automatic chunking
-  const ffmpegArgs = [
-    "-i", inputName,
-    "-vn",                   
-    "-ac", "1",              
-    "-ar", "16000", // Standard for AI transcription
-    "-af", "loudnorm=I=-16:TP=-1.5:LRA=11", // Normalization
-    "-c:a", codec,
-  ];
-
-  if (format === "mp3") {
-    ffmpegArgs.push("-b:a", "128k");
-  }
-
-  ffmpegArgs.push(
-    "-f", "segment",
-    "-segment_time", CHUNK_DURATION.toString(),
-    `output_%03d.${extension}`
-  );
-
   onProgress(`${isAudioInput ? 'Optimizing' : 'Extracting'} Audio (${format.toUpperCase()})...`, 15);
-  await ffmpeg.exec(ffmpegArgs);
-
-  onProgress("Reading chunks...", 90);
-
+  
   const chunks: ChunkResult[] = [];
   const numChunks = Math.ceil(duration / CHUNK_DURATION);
   let totalCompressedSize = 0;
 
   for (let i = 0; i < numChunks; i++) {
-    const chunkName = `output_${i.toString().padStart(3, "0")}.${extension}`;
+    const startTime = i * CHUNK_DURATION;
+    const chunkName = `chunk_${i}.${extension}`;
+    
+    onProgress(`Processing Part ${i + 1}/${numChunks}...`, Math.round(15 + (i / numChunks) * 75));
+
+    const chunkArgs = [
+      "-i", inputName,
+      "-ss", startTime.toString(),
+      "-t", CHUNK_DURATION.toString(),
+      "-vn",
+      "-ac", "1",
+      "-ar", "24000", // Increased for slightly better clarity
+      "-af", "silenceremove=1:0:-50dB,loudnorm=I=-16:TP=-1.5:LRA=11", // Clean silence then normalize
+      "-c:a", codec
+    ];
+
+    if (format === "mp3") {
+      chunkArgs.push("-b:a", "128k");
+    }
+
+    chunkArgs.push(chunkName);
+
+    await ffmpeg.exec(chunkArgs);
+
     try {
       const data = await ffmpeg.readFile(chunkName);
       if (typeof data === "string") continue;
@@ -143,7 +143,7 @@ export async function extractAudioDynamic(
       
       await ffmpeg.deleteFile(chunkName);
     } catch (e) {
-      console.warn(`Could not read chunk ${i}, might be empty or duration mismatch.`);
+      console.error(`Error reading chunk ${i}:`, e);
     }
   }
 

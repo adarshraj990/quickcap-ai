@@ -2,21 +2,25 @@
 
 import React, { useState, useCallback } from "react";
 import {
-  RotateCcw,
   AlertCircle,
   Globe,
   Languages,
   Cpu,
   Sparkles,
-  ShieldCheck,
-  Zap,
-  Video
+  LayoutDashboard,
+  FileText,
+  Settings,
+  Moon,
+  HelpCircle,
+  UploadCloud,
+  Film,
+  Download
 } from "lucide-react";
 import { DropZone } from "@/components/DropZone";
 import { ProgressBar } from "@/components/ProgressBar";
 import { CaptionList } from "@/components/CaptionList";
 import { extractAudioDynamic, CHUNK_DURATION } from "@/lib/ffmpeg-utils";
-import { type Segment, formatBytes } from "@/lib/utils";
+import { type Segment } from "@/lib/utils";
 
 type AppState = "idle" | "extracting" | "transcribing" | "done" | "error";
 
@@ -27,7 +31,7 @@ interface ProgressState {
 }
 
 const LANGUAGES = [
-  { code: "auto", name: "Auto-Detect (Any Language)" },
+  { code: "auto", name: "English (Auto)" }, // matched from image default
   { code: "hinglish", name: "Hinglish (Romanized)" },
   { code: "en", name: "English" },
   { code: "hi", name: "Hindi (Devanagari)" },
@@ -45,7 +49,7 @@ const LANGUAGES = [
 
 export default function Home() {
   const [appState, setAppState] = useState<AppState>("idle");
-  const [selectedLanguage, setSelectedLanguage] = useState("hinglish");
+  const [selectedLanguage, setSelectedLanguage] = useState("auto");
   const [isTranslateEnabled, setIsTranslateEnabled] = useState(false);
   const [targetLanguage, setTargetLanguage] = useState("en");
   const [mediaFile, setMediaFile] = useState<File | null>(null);
@@ -56,16 +60,11 @@ export default function Home() {
     extractProgress: 0,
     transcribeProgress: 0,
   });
-  const [audioStats, setAudioStats] = useState<{
-    originalSize: number;
-    compressedSize: number;
-  } | null>(null);
 
   const handleFileSelect = useCallback((file: File) => {
     setMediaFile(file);
     setError(null);
     setSegments([]);
-    setAudioStats(null);
   }, []);
 
   const handleProcess = useCallback(async () => {
@@ -77,26 +76,18 @@ export default function Home() {
         throw new Error("SharedArrayBuffer is disabled. Please use a modern browser on a secure connection.");
       }
 
-      // STEP 1: Loading Engine
       setAppState("extracting");
-      setProgress({ stage: "Step 1: Loading processing engine...", extractProgress: 10, transcribeProgress: 0 });
+      setProgress({ stage: "Loading processing engine...", extractProgress: 10, transcribeProgress: 0 });
 
-      // STEP 2: Local Extraction
-      const { chunks, originalSize, compressedSize } = await extractAudioDynamic(
+      const { chunks } = await extractAudioDynamic(
         mediaFile,
         (stage, p) => setProgress((prev) => ({ 
           ...prev, 
-          stage: `Step 2: Extracting audio from video (Local)... ${p}%`, 
+          stage: `Extracting audio... ${p}%`, 
           extractProgress: p 
         }))
       );
-      setAudioStats({ originalSize, compressedSize });
 
-      // LOGGING FOR VERIFICATION
-      console.log(`[VERIFICATION] Original Video Size: ${(originalSize / (1024 * 1024)).toFixed(2)} MB`);
-      console.log(`[VERIFICATION] Total Extracted Audio Size: ${(compressedSize / 1024).toFixed(2)} KB`);
-
-      // STEP 3: Uploading & Transcribing
       setAppState("transcribing");
       const allSegments: Segment[] = [];
       let globalIdCounter = 0;
@@ -104,17 +95,18 @@ export default function Home() {
       for (let i = 0; i < chunks.length; i++) {
         const { audioBlob, index } = chunks[i];
         
-        // Log individual chunk for verification
-        console.log(`[VERIFICATION] Sending Chunk ${i+1}. MIME Type: ${audioBlob.type}. Size: ${(audioBlob.size / 1024).toFixed(2)} KB`);
+        if (i > 0) {
+          await new Promise(r => setTimeout(r, 1000));
+        }
 
         setProgress((prev) => ({
           ...prev,
-          stage: `Step 3: Uploading audio for transcription (Part ${i + 1}/${chunks.length})...`,
+          stage: `Uploading audio... (Part ${i + 1}/${chunks.length})`,
           transcribeProgress: Math.round((i / chunks.length) * 100),
         }));
 
         const formData = new FormData();
-        formData.append("file", audioBlob, "audio.mp3"); // Using 'file' key as per strict requirement
+        formData.append("file", audioBlob, "audio.mp3");
         formData.append("language", selectedLanguage);
         formData.append("translate", isTranslateEnabled.toString());
         formData.append("targetLanguage", targetLanguage);
@@ -125,6 +117,7 @@ export default function Home() {
 
         const chunkOffset = index * CHUNK_DURATION;
         const rawSegments = data.transcription?.segments ?? [];
+        
         rawSegments.forEach((seg: any) => {
           allSegments.push({
             id: globalIdCounter++,
@@ -148,289 +141,216 @@ export default function Home() {
     setMediaFile(null);
     setSegments([]);
     setError(null);
-    setAudioStats(null);
     setProgress({ stage: "", extractProgress: 0, transcribeProgress: 0 });
   }, []);
 
   const isProcessing = appState === "extracting" || appState === "transcribing";
 
   return (
-    <main className="min-h-screen relative selection:bg-indigo-500/30">
-      {/* Stunning Background Layer */}
-      <div className="bg-mesh" />
-      <div className="absolute inset-0 bg-black/40 pointer-events-none z-0" />
-      
-      <div className="relative max-w-[1400px] mx-auto px-6 py-24 md:py-40 space-y-32 md:space-y-48 z-10">
-        
-        {/* Header */}
-        <header className="flex flex-col items-center text-center space-y-8 mb-12">
-          <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full glass-premium text-[11px] font-black uppercase tracking-[0.2em] text-cyan-400 mb-4 animate-fade-up">
-            <Sparkles className="w-4 h-4" /> Professional Suite
+    <div className="h-screen bg-[#080A11] flex overflow-hidden">
+      {/* Sidebar */}
+      <aside className="w-64 bg-[#0D111C] border-r border-white/5 flex-col hidden lg:flex shrink-0 z-20">
+        <div className="flex items-center gap-3 p-6 mb-2">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center shadow-lg shadow-violet-500/20">
+            <Sparkles className="w-5 h-5 text-white" />
           </div>
-          <h1 className="text-6xl md:text-8xl font-black tracking-tighter text-white drop-shadow-2xl animate-fade-up leading-[0.9]" style={{ animationDelay: "0.1s" }}>
-            QUICKCAP <span className="text-gradient">AI</span>
-          </h1>
-          <p className="text-lg md:text-xl font-medium text-slate-300 max-w-2xl mx-auto animate-fade-up" style={{ animationDelay: "0.2s" }}>
-            The most stunning automatic caption engine. <br/> Zero server costs. Maximum privacy.
-          </p>
+          <span className="text-xl font-bold text-white tracking-tight">CaptiAI</span>
+        </div>
+
+        <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
+          <a href="#" className="flex items-center gap-3 px-4 py-3 rounded-xl bg-violet-500/10 text-violet-400 font-medium text-sm border border-violet-500/20">
+            <Film className="w-5 h-5" />
+            <span>Generate Captions</span>
+          </a>
+        </nav>
+
+        <div className="p-4 mt-auto">
+          <a href="#" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-colors">
+            <HelpCircle className="w-5 h-5" />
+            <span className="font-medium text-sm">Help & Support</span>
+          </a>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
+        {/* Top Header */}
+        <header className="flex items-center justify-end px-8 py-4 border-b border-white/5 bg-[#0D111C]/80 backdrop-blur-md sticky top-0 z-10 shrink-0">
+          <div className="flex items-center gap-4">
+            <button className="p-2 rounded-full text-slate-400 hover:text-white hover:bg-white/5 transition-colors">
+              <Moon className="w-5 h-5" />
+            </button>
+          </div>
         </header>
 
-        {/* Main Layout Grid */}
-        <div className={`flex flex-col ${appState === "done" ? "lg:grid lg:grid-cols-12 lg:items-start" : "items-center"} gap-24 md:gap-32 transition-all duration-700`}>
-          
-          {/* Controls Column / Upload Zone */}
-          <div className={`${appState === "done" ? "lg:col-span-4 w-full" : "max-w-3xl w-full"} space-y-12 animate-fade-up`} style={{ animationDelay: "0.3s" }}>
+        {/* Dashboard Content */}
+        <div className="p-6 md:p-8 flex-1">
+          <div className="mb-8">
+            <h1 className="text-2xl font-bold text-white flex items-center gap-2 mb-2">
+              AI Captions for Your Videos <Sparkles className="w-5 h-5 text-violet-400" />
+            </h1>
+            <p className="text-sm text-slate-400">
+              Upload a video, and let AI generate accurate captions for you.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 max-w-[1600px] mx-auto">
             
-            <div className="space-y-6">
-              {/* Dropzone */}
-              {(appState === "idle" || isProcessing || appState === "error") && (
-                <div className="glass-premium rounded-3xl p-2 shadow-2xl">
+            {/* Left Column */}
+            <div className="space-y-6 flex flex-col">
+              {/* Upload Video Card */}
+              <div className="bg-[#121622] border border-white/5 rounded-2xl p-6 flex flex-col relative shrink-0">
+                <div className="flex items-center gap-2 mb-4 relative z-10">
+                  <UploadCloud className="w-5 h-5 text-slate-400" />
+                  <h2 className="text-base font-semibold text-white">Upload Video</h2>
+                </div>
+                <div className="flex-1 relative z-10 min-h-[280px]">
                   <DropZone onFileSelect={handleFileSelect} disabled={isProcessing} />
                 </div>
-              )}
+              </div>
 
-              {/* Settings Block */}
-              {mediaFile && !isProcessing && appState !== "done" && (
-                <div className="glass-premium p-8 rounded-3xl space-y-8 animate-fade-up shadow-[0_0_50px_rgba(139,92,246,0.1)] border border-white/10 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-violet-500/20 blur-[50px] pointer-events-none rounded-full" />
-                  
-                  {/* Language Selector */}
-                  <div className="space-y-3 relative z-10">
-                    <label className="text-xs font-bold uppercase tracking-widest text-slate-300 flex items-center gap-2">
-                      <Globe className="w-4 h-4 text-violet-400" /> Media Language
-                    </label>
+              {/* Caption Settings Card */}
+              <div className="bg-[#121622] border border-white/5 rounded-2xl p-6 flex flex-col shrink-0">
+                <div className="flex items-center gap-2 mb-6">
+                  <Settings className="w-5 h-5 text-slate-400" />
+                  <h2 className="text-base font-semibold text-white">Caption Settings</h2>
+                </div>
+                
+                <div className="space-y-5 flex-1">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium text-slate-300">Language</label>
                     <select
                       value={selectedLanguage}
                       onChange={(e) => setSelectedLanguage(e.target.value)}
-                      className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-sm font-bold text-white focus:ring-2 focus:ring-violet-500 focus:border-violet-500 outline-none transition-all cursor-pointer shadow-inner appearance-none"
+                      className="w-48 bg-[#090C15] border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white focus:ring-1 focus:ring-violet-500 outline-none appearance-none"
                     >
                       {LANGUAGES.map((lang) => (
-                        <option key={lang.code} value={lang.code} className="bg-slate-900 text-white font-medium">{lang.name}</option>
+                        <option key={lang.code} value={lang.code} className="bg-[#0D111C]">{lang.name}</option>
                       ))}
                     </select>
                   </div>
-
-                  <div className="h-px bg-white/5 relative z-10" />
-
-                  {/* Translation Toggle */}
-                  <div className="flex items-center justify-between relative z-10">
-                    <div>
-                      <p className="text-sm font-bold text-white flex items-center gap-2">
-                        <Languages className="w-4 h-4 text-pink-400" /> Translate Output
-                      </p>
-                      <p className="text-[11px] text-slate-400 mt-1 font-medium">Powered by Llama 3 AI</p>
-                    </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium text-slate-300 flex items-center gap-2">
+                      Translate Output
+                    </label>
                     <button
                       onClick={() => setIsTranslateEnabled(!isTranslateEnabled)}
-                      className={`relative inline-flex h-7 w-14 items-center rounded-full transition-all duration-300 focus:outline-none ${isTranslateEnabled ? 'bg-gradient-to-r from-pink-500 to-violet-500 shadow-[0_0_15px_rgba(236,72,153,0.5)]' : 'bg-white/10 border border-white/5'}`}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isTranslateEnabled ? 'bg-violet-500' : 'bg-white/10'}`}
                     >
-                      <span className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform duration-300 shadow-md ${isTranslateEnabled ? 'translate-x-8' : 'translate-x-1'}`} />
+                      <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isTranslateEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
                     </button>
                   </div>
 
-                  {/* Target Language Selector */}
                   {isTranslateEnabled && (
-                    <div className="space-y-3 animate-fade-up relative z-10">
-                      <label className="text-xs font-bold uppercase tracking-widest text-slate-300">Target Language</label>
+                    <div className="flex items-center justify-between animate-fade-up">
+                      <label className="text-sm font-medium text-slate-300">Target Language</label>
                       <select
                         value={targetLanguage}
                         onChange={(e) => setTargetLanguage(e.target.value)}
-                        className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-sm font-bold text-white focus:ring-2 focus:ring-pink-500 focus:border-pink-500 outline-none transition-all cursor-pointer shadow-inner appearance-none"
+                        className="w-48 bg-[#090C15] border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white focus:ring-1 focus:ring-violet-500 outline-none appearance-none"
                       >
                         {LANGUAGES.filter(l => l.code !== 'auto' && l.code !== 'hinglish').map((lang) => (
-                          <option key={lang.code} value={lang.code} className="bg-slate-900 text-white font-medium">{lang.name}</option>
+                          <option key={lang.code} value={lang.code} className="bg-[#0D111C]">{lang.name}</option>
                         ))}
                       </select>
                     </div>
                   )}
 
-                  <button
-                    onClick={handleProcess}
-                    className="w-full btn-wow py-5 rounded-2xl text-sm font-black uppercase tracking-[0.2em] mt-4 relative z-10"
-                  >
-                    Generate Captions
-                  </button>
-                  
-                  <div className="text-center mt-4 relative z-10">
-                    <button onClick={handleReset} className="text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-white transition-colors">
-                      Start Over
+                  <div className="pt-4 border-t border-white/5 mt-2">
+                    <button
+                      onClick={handleProcess}
+                      disabled={!mediaFile || isProcessing || appState === "done"}
+                      className="w-full bg-violet-600 hover:bg-violet-500 text-white py-3.5 rounded-xl text-sm font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(139,92,246,0.3)] hover:shadow-[0_0_30px_rgba(139,92,246,0.5)]"
+                    >
+                      <Sparkles className="w-4 h-4" />
+                      {isProcessing ? "Processing..." : "Generate Captions"}
                     </button>
                   </div>
-                </div>
-              )}
 
-              {/* Completed State Stats */}
-              {appState === "done" && (
-                <div className="glass-premium p-8 rounded-3xl space-y-8 animate-fade-up border border-white/10 shadow-2xl">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Status</span>
-                    <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full shadow-[0_0_15px_rgba(16,185,129,0.2)]">
-                      Completed
-                    </span>
-                  </div>
-                  
-                  {audioStats && (
-                    <div className="space-y-2">
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Optimization Saved</p>
-                      <div className="flex items-end gap-3">
-                        <p className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-br from-emerald-400 to-cyan-400">{formatBytes(audioStats.originalSize - audioStats.compressedSize)}</p>
-                        <p className="text-sm font-bold text-slate-500 mb-1">Bandwidth</p>
-                      </div>
+                  {isProcessing && (
+                    <div className="mt-4 p-4 rounded-xl bg-violet-500/10 border border-violet-500/20 space-y-4">
+                      <ProgressBar
+                        label="Local Audio Extraction"
+                        progress={progress.extractProgress}
+                        color={appState === "extracting" ? "secondary" : "success"}
+                      />
+                      <ProgressBar
+                        label="Cloud AI Processing"
+                        progress={progress.transcribeProgress}
+                        color="primary"
+                        message={progress.stage}
+                      />
                     </div>
                   )}
                   
-                  <button onClick={handleReset} className="w-full btn-glass py-4 rounded-2xl text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2">
-                    <RotateCcw className="w-4 h-4" /> New Project
-                  </button>
+                  {appState === "error" && (
+                    <div className="mt-4 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+                      <AlertCircle className="w-4 h-4 inline mr-2" />
+                      {error}
+                      <button onClick={handleReset} className="ml-2 underline hover:text-red-300">Reset</button>
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
+            </div>
 
-              {/* Progress Card */}
-              {isProcessing && (
-                <div className="glass-premium p-8 rounded-3xl space-y-10 animate-fade-up shadow-[0_0_50px_rgba(6,182,212,0.15)] border border-cyan-500/20">
-                  <div className="flex items-center gap-3 border-b border-white/10 pb-4">
-                     <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-cyan-400 to-indigo-500 flex items-center justify-center shadow-lg animate-pulse">
-                        <Cpu className="w-5 h-5 text-white" />
-                     </div>
-                     <div>
-                        <p className="text-sm font-bold text-white">AI Engine Running</p>
-                        <p className="text-[10px] font-medium text-cyan-300 uppercase tracking-widest mt-0.5">Zero Server Data Transfer</p>
-                     </div>
+            {/* Right Column */}
+            <div className="space-y-6 flex flex-col">
+              {appState === "done" && mediaFile ? (
+                <CaptionList 
+                  segments={segments} 
+                  mediaFile={mediaFile} 
+                  onUpdateSegments={setSegments} 
+                  onReset={handleReset}
+                />
+              ) : (
+                <>
+                  {/* Empty States */}
+                  <div className="bg-[#121622] border border-white/5 rounded-2xl p-6 h-[320px] flex flex-col">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        <Film className="w-5 h-5 text-slate-400" />
+                        <h2 className="text-base font-semibold text-white">Video Preview</h2>
+                      </div>
+                      <button className="text-xs font-medium px-4 py-2 bg-[#1E2335] hover:bg-[#282F45] rounded-lg text-slate-300 transition-colors pointer-events-none opacity-50">
+                        Change Video
+                      </button>
+                    </div>
+                    <div className="flex-1 border border-white/5 rounded-xl bg-[#090C15] flex flex-col items-center justify-center text-slate-500 gap-3">
+                      <Film className="w-8 h-8 opacity-20" />
+                      <p className="text-sm">Video preview will appear here</p>
+                    </div>
                   </div>
-                  <ProgressBar
-                    label="Local Media Processing"
-                    progress={progress.extractProgress}
-                    color={appState === "extracting" ? "secondary" : "success"}
-                  />
-                  <ProgressBar
-                    label="Cloud AI Transcription"
-                    progress={progress.transcribeProgress}
-                    color="primary"
-                    message={progress.stage}
-                  />
-                </div>
-              )}
 
-              {/* Error State */}
-              {appState === "error" && (
-                <div className="p-6 border border-red-500/30 rounded-3xl bg-red-950/40 backdrop-blur-md flex items-start gap-4 animate-fade-up shadow-[0_0_30px_rgba(239,68,68,0.2)]">
-                  <AlertCircle className="w-6 h-6 text-red-400 mt-1 shrink-0" />
-                  <div>
-                    <p className="text-base font-bold text-white">Processing Error</p>
-                    <p className="text-sm text-red-200 mt-2 leading-relaxed">{error}</p>
-                    <button onClick={handleReset} className="mt-5 text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-white transition-colors border border-red-500/30">
-                      Try Again
-                    </button>
-                    <p className="mt-4 text-[10px] text-red-400 opacity-70 italic">
-                      Reminder: Ensure GROQ_API_KEY is set in your Vercel Dashboard.
-                    </p>
+                  <div className="bg-[#121622] border border-white/5 rounded-2xl p-6 flex-1 min-h-[300px] flex flex-col">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-5 h-5 text-slate-400" />
+                        <h2 className="text-base font-semibold text-white">Generated Captions</h2>
+                      </div>
+                      <div className="flex items-center gap-2 opacity-50 pointer-events-none">
+                         <button className="px-4 py-2 bg-[#1E2335] rounded-lg text-xs font-semibold text-slate-300">
+                           Edit Captions
+                         </button>
+                         <button className="px-4 py-2 bg-violet-600 rounded-lg text-xs font-semibold text-white flex items-center gap-2">
+                           <Download className="w-4 h-4" /> Download
+                         </button>
+                      </div>
+                    </div>
+                    <div className="flex-1 border border-white/5 rounded-xl bg-[#090C15] flex flex-col items-center justify-center text-slate-500 gap-3">
+                      <FileText className="w-8 h-8 opacity-20" />
+                      <p className="text-sm">Captions list will appear here</p>
+                    </div>
                   </div>
-                </div>
+                </>
               )}
             </div>
+
           </div>
-
-          {/* Editor Column (Split Screen) */}
-          {appState === "done" && (
-            <div className="lg:col-span-8 animate-fade-up" style={{ animationDelay: "0.2s" }}>
-              <CaptionList 
-                segments={segments} 
-                mediaFile={mediaFile!} 
-                onUpdateSegments={setSegments} 
-              />
-            </div>
-          )}
-
         </div>
-
-        {/* --- PREMIUM FEATURES SECTION --- */}
-        {appState === "idle" && (
-          <section className="mt-48 space-y-24 animate-fade-up" style={{ animationDelay: "0.4s" }}>
-            <div className="text-center space-y-6">
-              <h2 className="text-4xl md:text-6xl font-black text-white drop-shadow-xl">
-                Built for <span className="text-gradient">Creators</span>
-              </h2>
-              <p className="text-lg md:text-xl text-slate-400 font-medium max-w-2xl mx-auto leading-relaxed">
-                QuickCap AI is a high-performance powerhouse engineered for those who value speed, privacy, and flawless quality.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
-              {/* Feature 1 */}
-              <div className="glass-premium p-10 rounded-[2.5rem] space-y-6 border border-white/5 hover:border-violet-500/30 transition-all duration-500 group">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 flex items-center justify-center border border-white/10 group-hover:scale-110 transition-transform duration-300">
-                  <ShieldCheck className="w-8 h-8 text-fuchsia-400" />
-                </div>
-                <div className="space-y-3">
-                  <h3 className="text-2xl font-bold text-white">100% Private Engine</h3>
-                  <p className="text-slate-400 leading-relaxed text-lg">
-                    Unmatched privacy is at our core. Your video files never leave your device. We use cutting-edge WebAssembly to extract audio locally, ensuring your data is always yours.
-                  </p>
-                </div>
-              </div>
-
-              {/* Feature 2 */}
-              <div className="glass-premium p-10 rounded-[2.5rem] space-y-6 border border-white/5 hover:border-cyan-500/30 transition-all duration-500 group">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center border border-white/10 group-hover:scale-110 transition-transform duration-300">
-                  <Zap className="w-8 h-8 text-cyan-400" />
-                </div>
-                <div className="space-y-3">
-                  <h3 className="text-2xl font-bold text-white">Blazing Fast AI</h3>
-                  <p className="text-slate-400 leading-relaxed text-lg">
-                    Powered by Whisper-large-v3 on Groq's high-speed LPUs. Generate hyper-accurate captions for 100+ languages in mere seconds, not minutes.
-                  </p>
-                </div>
-              </div>
-
-              {/* Feature 3 */}
-              <div className="glass-premium p-10 rounded-[2.5rem] space-y-6 border border-white/5 hover:border-pink-500/30 transition-all duration-500 group">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-500/20 to-rose-500/20 flex items-center justify-center border border-white/10 group-hover:scale-110 transition-transform duration-300">
-                  <Globe className="w-8 h-8 text-pink-400" />
-                </div>
-                <div className="space-y-3">
-                  <h3 className="text-2xl font-bold text-white">Llama 3 Translation</h3>
-                  <p className="text-slate-400 leading-relaxed text-lg">
-                    Seamless global reach. Instantly translate your captions to any target language with advanced AI context awareness, expanding your audience globally.
-                  </p>
-                </div>
-              </div>
-
-              {/* Feature 4 */}
-              <div className="glass-premium p-10 rounded-[2.5rem] space-y-6 border border-white/5 hover:border-emerald-500/30 transition-all duration-500 group">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center border border-white/10 group-hover:scale-110 transition-transform duration-300">
-                  <Video className="w-8 h-8 text-emerald-400" />
-                </div>
-                <div className="space-y-3">
-                  <h3 className="text-2xl font-bold text-white">Live Editor Suite</h3>
-                  <p className="text-slate-400 leading-relaxed text-lg">
-                    A professional studio built into your browser. Click timestamps to jump through your video and edit your captions in real-time with ease.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* --- TECHNOLOGY STACK --- */}
-            <div className="pt-32 pb-12 border-t border-white/5 text-center space-y-12">
-               <h3 className="text-xs font-black uppercase tracking-[0.4em] text-slate-500">The Powerhouse Technology</h3>
-               <div className="flex flex-wrap justify-center items-center gap-16 opacity-50 hover:opacity-100 transition-opacity duration-500">
-                  <div className="flex items-center gap-3 grayscale hover:grayscale-0 transition-all">
-                    <div className="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center font-black text-orange-400">FF</div>
-                    <span className="font-bold text-white text-lg">FFmpeg.wasm</span>
-                  </div>
-                  <div className="flex items-center gap-3 grayscale hover:grayscale-0 transition-all">
-                    <div className="w-10 h-10 rounded-lg bg-indigo-500/20 flex items-center justify-center font-black text-indigo-400 font-mono">G</div>
-                    <span className="font-bold text-white text-lg">Groq Cloud</span>
-                  </div>
-                  <div className="flex items-center gap-3 grayscale hover:grayscale-0 transition-all">
-                    <div className="w-10 h-10 rounded-lg bg-pink-500/20 flex items-center justify-center font-black text-pink-400">L3</div>
-                    <span className="font-bold text-white text-lg">Llama 3.1</span>
-                  </div>
-               </div>
-            </div>
-          </section>
-        )}
-
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }
+

@@ -89,11 +89,11 @@ export function DropZone({ onFileSelect, disabled }: DropZoneProps) {
         className={`
           relative w-full rounded-3xl border-2 border-dashed p-10 
           flex flex-col items-center justify-center gap-5 cursor-pointer
-          transition-all duration-500 overflow-hidden group
+          transition-all duration-500 group
           ${disabled ? "opacity-50 cursor-not-allowed" : "hover:scale-[1.01]"}
         `}
         style={{
-          minHeight: "260px",
+          minHeight: "280px",
           borderColor: isDragging ? "var(--primary)" : "rgba(255,255,255,0.1)",
           background: isDragging ? "rgba(139, 92, 246, 0.05)" : "rgba(15, 23, 42, 0.3)",
           boxShadow: isDragging ? "0 0 40px rgba(139, 92, 246, 0.2) inset" : "none"
