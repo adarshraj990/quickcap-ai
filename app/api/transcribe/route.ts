@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
     // Configure language and prompt dynamically based on user selection
     if (selectedLanguage === "hinglish") {
       whisperParams.language = "en"; 
-      whisperParams.prompt = "This is a Hinglish video where people speak a mix of Hindi and English. Transcribe the Hindi parts in Roman script (e.g., 'kaise hain' instead of 'कैसे हैं'). Focus on conversational flow.";
+      whisperParams.prompt = "This is a Hinglish video with frequent switching between Hindi and English. Transcribe Hindi parts in Roman script (e.g., 'Aap kaise hain?' instead of 'आप कैसे हैं?'). Capture English as is. Focus on natural conversational flow and correct Roman Hindi spellings.";
     } else if (selectedLanguage === "hi") {
       whisperParams.language = "hi";
       whisperParams.prompt = "यह एक हिंदी वीडियो है। कृपया इसे शुद्ध देवनागरी लिपि में ट्रांसक्राइब करें। विराम चिह्नों का सही प्रयोग करें।";
@@ -43,7 +43,8 @@ export async function POST(req: NextRequest) {
       whisperParams.language = selectedLanguage;
       whisperParams.prompt = `This is a clear, professional transcription in ${selectedLanguage}. Maintain all technical terms and proper nouns.`;
     } else {
-      whisperParams.prompt = "Transcribe the audio accurately. If multiple languages are spoken, capture them as they are. Maintain punctuation and casing.";
+      // TRUE AUTO-DETECT MODE
+      whisperParams.prompt = "Transcribe the audio accurately. The speaker might use multiple languages (Code-switching), such as Hindi, English, or others in the same sentence. Capture all words as they are spoken, maintaining the original language of each word. Do not translate. Maintain punctuation and casing.";
     }
 
     const transcription = await groq.audio.transcriptions.create(whisperParams);

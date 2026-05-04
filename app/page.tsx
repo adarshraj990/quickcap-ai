@@ -36,7 +36,7 @@ interface ProgressState {
 }
 
 const LANGUAGES = [
-  { code: "auto", name: "English (Auto)" }, // matched from image default
+  { code: "auto", name: "Auto-Detect (Global)" }, 
   { code: "hinglish", name: "Hinglish (Romanized)" },
   { code: "en", name: "English" },
   { code: "hi", name: "Hindi (Devanagari)" },
