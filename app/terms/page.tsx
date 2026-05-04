@@ -1,53 +1,93 @@
-import React from 'react';
+import React from "react";
+import { Gavel, CheckCircle, AlertTriangle, Scale } from "lucide-react";
 
 export const metadata = {
-  title: 'Terms of Service | QuickCap AI',
-  description: 'Read the terms of service for using QuickCap AI.',
+  title: "Terms and Conditions | QuickCap AI",
+  description: "Read the terms and conditions for using QuickCap AI services.",
 };
 
-export default function TermsPage() {
+export default function TermsAndConditions() {
   return (
-    <main className="min-h-screen relative py-24 px-6">
+    <div className="min-h-screen bg-[#080A11] relative overflow-hidden">
       <div className="bg-mesh" />
-      <div className="absolute inset-0 bg-black/40 pointer-events-none z-0" />
-      <div className="relative max-w-4xl mx-auto z-10 glass-premium rounded-3xl p-10 md:p-16 animate-fade-up border border-white/10 shadow-2xl">
-        <h1 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400 mb-8">
-          Terms of Service
-        </h1>
-        
-        <div className="space-y-6 text-slate-300 leading-relaxed text-base font-medium">
-          <p>Last updated: May 2026</p>
+      
+      <main className="max-w-4xl mx-auto px-6 py-20 relative z-10">
+        <div className="animate-fade-up">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center shadow-lg shadow-violet-500/20">
+              <Gavel className="w-6 h-6 text-white" />
+            </div>
+            <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight">
+              Terms & <span className="text-gradient">Conditions</span>
+            </h1>
+          </div>
           
-          <p>
-            By accessing and using <strong>QuickCap AI</strong>, you accept and agree to be bound by the terms and provision of this agreement.
-          </p>
-          
-          <h2 className="text-2xl font-bold text-white pt-4">1. Use of Service</h2>
-          <p>
-            QuickCap AI provides a browser-based tool for generating captions for video files. The service is provided "as is" and "as available". We do not guarantee that the service will be uninterrupted or error-free.
+          <p className="text-slate-400 text-lg mb-12 max-w-2xl leading-relaxed">
+            By accessing QuickCap AI, you agree to be bound by these terms. Please read them carefully to understand your rights and responsibilities.
           </p>
 
-          <h2 className="text-2xl font-bold text-white pt-4">2. User Responsibilities</h2>
-          <p>
-            You are solely responsible for the content you process using our tool. You agree not to use QuickCap AI to process illicit, illegal, or highly sensitive content. Although we do not store your videos, you must have the legal right to process the media you upload.
-          </p>
+          <div className="space-y-12">
+            <section className="glass-premium p-8 rounded-3xl border border-white/5">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="p-3 rounded-lg bg-violet-500/10 text-violet-400">
+                  <CheckCircle className="w-6 h-6" />
+                </div>
+                <h2 className="text-2xl font-bold text-white">1. Use of Service</h2>
+              </div>
+              <div className="space-y-4 text-slate-300 leading-relaxed">
+                <p>
+                  QuickCap AI provides AI-powered transcription and captioning tools. You are granted a non-exclusive, non-transferable, revocable license to access and use the service strictly in accordance with these terms.
+                </p>
+                <ul className="list-disc list-inside space-y-2 ml-4">
+                  <li>You must be at least 13 years of age to use this service.</li>
+                  <li>You are responsible for any content you upload and must have the legal right to process said content.</li>
+                  <li>The service is provided for individual or commercial use, subject to fair usage limits.</li>
+                </ul>
+              </div>
+            </section>
 
-          <h2 className="text-2xl font-bold text-white pt-4">3. Intellectual Property</h2>
-          <p>
-            The service and its original content, features, and functionality are and will remain the exclusive property of QuickCap AI and its licensors.
-          </p>
+            <section className="glass-premium p-8 rounded-3xl border border-white/5">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="p-3 rounded-lg bg-pink-500/10 text-pink-400">
+                  <AlertTriangle className="w-6 h-6" />
+                </div>
+                <h2 className="text-2xl font-bold text-white">2. Prohibited Content</h2>
+              </div>
+              <p className="text-slate-300 leading-relaxed">
+                You agree not to use the service to process any content that:
+                <br />- Is illegal, harmful, or promotes discrimination.
+                <br />- Infringes upon any third-party intellectual property rights.
+                <br />- Contains malware, viruses, or any other destructive code.
+              </p>
+            </section>
 
-          <h2 className="text-2xl font-bold text-white pt-4">4. Advertising and Third Links</h2>
-          <p>
-            Our service may contain links to third-party web sites or services that are not owned or controlled by QuickCap AI. We have no control over, and assume no responsibility for, the content, privacy policies, or practices of any third party web sites or services. We may display advertisements on the platform to maintain the service.
-          </p>
+            <section className="glass-premium p-8 rounded-3xl border border-white/5">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="p-3 rounded-lg bg-cyan-500/10 text-cyan-400">
+                  <Scale className="w-6 h-6" />
+                </div>
+                <h2 className="text-2xl font-bold text-white">3. Limitation of Liability</h2>
+              </div>
+              <p className="text-slate-300 leading-relaxed">
+                QuickCap AI shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of or inability to use the service. We do not guarantee 100% accuracy in AI-generated captions.
+              </p>
+            </section>
 
-          <h2 className="text-2xl font-bold text-white pt-4">5. Limitation of Liability</h2>
-          <p>
-            In no event shall QuickCap AI, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your access to or use of or inability to access or use the Service.
-          </p>
+            <section className="glass-premium p-8 rounded-3xl border border-white/5">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="p-3 rounded-lg bg-blue-500/10 text-blue-400">
+                  <Gavel className="w-6 h-6" />
+                </div>
+                <h2 className="text-2xl font-bold text-white">4. Governing Law</h2>
+              </div>
+              <p className="text-slate-300 leading-relaxed">
+                These terms shall be governed and construed in accordance with the laws of the jurisdiction in which the service operator resides, without regard to its conflict of law provisions.
+              </p>
+              <p className="mt-4 text-slate-400 text-sm italic">Last Updated: May 4, 2026</p>
+            </section>
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }

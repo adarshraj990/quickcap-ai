@@ -10,9 +10,12 @@ export function Footer() {
           </p>
           
           <nav className="flex flex-wrap items-center justify-center gap-6 text-xs font-bold uppercase tracking-widest text-slate-400">
+            <Link href="/" className="hover:text-white transition-colors">Home</Link>
             <Link href="/about" className="hover:text-white transition-colors">About</Link>
             <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
-            <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
+            <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
+            <Link href="/disclaimer" className="hover:text-white transition-colors">Disclaimer</Link>
+            <Link href="/blog" className="hover:text-white transition-colors">Blog</Link>
             <Link href="/contact" className="hover:text-white transition-colors">Contact</Link>
           </nav>
         </div>

@@ -14,7 +14,12 @@ import {
   HelpCircle,
   UploadCloud,
   Film,
-  Download
+  Download,
+  CheckCircle2,
+  Zap,
+  Shield,
+  Clock,
+  ArrowRight
 } from "lucide-react";
 import { DropZone } from "@/components/DropZone";
 import { ProgressBar } from "@/components/ProgressBar";
@@ -184,13 +189,13 @@ export default function Home() {
         </header>
 
         {/* Dashboard Content */}
-        <div className="p-6 md:p-8 flex-1">
+        <div className="p-6 md:p-8 shrink-0">
           <div className="mb-8">
             <h1 className="text-2xl font-bold text-white flex items-center gap-2 mb-2">
               AI Captions for Your Videos <Sparkles className="w-5 h-5 text-violet-400" />
             </h1>
             <p className="text-sm text-slate-400">
-              Upload a video, and let AI generate accurate captions for you.
+              Upload a video, and let AI generate accurate <span className="text-violet-400 font-semibold">auto subtitles</span> for you.
             </p>
           </div>
 
@@ -264,7 +269,7 @@ export default function Home() {
                       className="w-full bg-violet-600 hover:bg-violet-500 text-white py-3.5 rounded-xl text-sm font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(139,92,246,0.3)] hover:shadow-[0_0_30px_rgba(139,92,246,0.5)]"
                     >
                       <Sparkles className="w-4 h-4" />
-                      {isProcessing ? "Processing..." : "Generate Captions"}
+                      {isProcessing ? "Processing..." : "Generate AI Captions"}
                     </button>
                   </div>
 
@@ -346,9 +351,115 @@ export default function Home() {
                 </>
               )}
             </div>
-
           </div>
         </div>
+
+        {/* --- Marketing Sections --- */}
+
+        {/* How it Works */}
+        <section className="py-24 px-8 border-t border-white/5 bg-[#0A0D16]">
+          <div className="max-w-[1400px] mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-black text-white mb-4">How It <span className="text-gradient">Works</span></h2>
+              <p className="text-slate-400 max-w-2xl mx-auto">Generate accurate <strong className="text-white">AI captions</strong> in four simple steps without ever uploading your full video file.</p>
+            </div>
+            
+            <div className="grid md:grid-cols-4 gap-8">
+              {[
+                { step: "01", title: "Upload Video", desc: "Select your Reels, Shorts, or TikTok videos. We support MP4, MOV, and AVI." },
+                { step: "02", title: "Local Extraction", desc: "Our engine extracts the audio locally in your browser for 100% privacy." },
+                { step: "03", title: "AI Magic", desc: "Groq-powered Whisper AI creates high-speed, accurate video transcription." },
+                { step: "04", title: "Export & Viral", desc: "Review your captions and download .SRT or .VTT files instantly." }
+              ].map((item, i) => (
+                <div key={i} className="relative p-8 rounded-3xl bg-white/5 border border-white/5 hover:border-violet-500/30 transition-all">
+                  <span className="text-5xl font-black text-white/5 absolute top-4 right-6">{item.step}</span>
+                  <h3 className="text-xl font-bold text-white mb-3 flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-violet-400" />
+                    {item.title}
+                  </h3>
+                  <p className="text-slate-400 text-sm leading-relaxed">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Key Features */}
+        <section className="py-24 px-8 bg-[#080A11]">
+          <div className="max-w-[1400px] mx-auto">
+            <div className="flex flex-col lg:flex-row items-center gap-16">
+              <div className="lg:w-1/2">
+                <h2 className="text-4xl md:text-5xl font-black text-white mb-8 tracking-tight">
+                  Powerful Features for <br />
+                  <span className="text-gradient">Modern Creators</span>
+                </h2>
+                <div className="space-y-6">
+                  {[
+                    { icon: Shield, title: "Privacy First Approach", desc: "Your video files never leave your device. We only process audio tracks." },
+                    { icon: Zap, title: "Audio-only Processing", desc: "Saves 90% of bandwidth compared to cloud video uploading." },
+                    { icon: Clock, title: "Fast Turnaround", desc: "Get auto subtitles in seconds, not minutes. Perfect for tight deadlines." },
+                    { icon: Globe, title: "High Accuracy AI", desc: "State-of-the-art Whisper models ensure your transcription is spot-on." }
+                  ].map((feat, i) => (
+                    <div key={i} className="flex gap-4">
+                      <div className="shrink-0 w-12 h-12 rounded-xl bg-violet-500/10 flex items-center justify-center border border-violet-500/20">
+                        <feat.icon className="w-6 h-6 text-violet-400" />
+                      </div>
+                      <div>
+                        <h4 className="text-lg font-bold text-white mb-1">{feat.title}</h4>
+                        <p className="text-slate-400 text-sm leading-relaxed">{feat.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="lg:w-1/2 relative">
+                <div className="aspect-square rounded-[3rem] bg-gradient-to-br from-violet-600/20 to-fuchsia-600/20 border border-white/10 flex items-center justify-center overflow-hidden">
+                   <div className="relative z-10 text-center p-12">
+                      <Sparkles className="w-20 h-20 text-violet-400 mx-auto mb-6 opacity-50" />
+                      <p className="text-xl font-bold text-slate-300 italic">"The fastest way to generate captions for social media creators."</p>
+                   </div>
+                   {/* Decorative Blobs */}
+                   <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-violet-500/20 blur-[100px] rounded-full" />
+                   <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-pink-500/20 blur-[100px] rounded-full" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Why Choose QuickCap */}
+        <section className="py-24 px-8 bg-gradient-to-b from-[#080A11] to-[#0D111C]">
+          <div className="max-w-[1000px] mx-auto text-center">
+            <h2 className="text-4xl md:text-6xl font-black text-white mb-8 tracking-tighter">
+              Stop Typing. <br />
+              <span className="text-gradient uppercase">Start Trending.</span>
+            </h2>
+            <p className="text-xl text-slate-400 mb-12 leading-relaxed">
+              Don't let your message get lost on mute. <strong className="text-white">QuickCap AI</strong> helps social media creators reach millions with automated, accurate, and stylish subtitles for every video.
+            </p>
+            <div className="grid md:grid-cols-3 gap-6 mb-12">
+              <div className="p-6 rounded-2xl bg-white/5 border border-white/5">
+                <h4 className="text-3xl font-black text-white mb-2">80%</h4>
+                <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">Watched on Mute</p>
+              </div>
+              <div className="p-6 rounded-2xl bg-white/5 border border-white/5">
+                <h4 className="text-3xl font-black text-white mb-2">10x</h4>
+                <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">Faster workflow</p>
+              </div>
+              <div className="p-6 rounded-2xl bg-white/5 border border-white/5">
+                <h4 className="text-3xl font-black text-white mb-2">Zero</h4>
+                <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">Subscription Fees</p>
+              </div>
+            </div>
+            <button 
+               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+               className="btn-wow px-10 py-5 rounded-2xl font-black text-xl flex items-center justify-center gap-3 mx-auto"
+            >
+              Generate Free AI Captions Now
+              <ArrowRight className="w-6 h-6" />
+            </button>
+          </div>
+        </section>
       </main>
     </div>
   );
