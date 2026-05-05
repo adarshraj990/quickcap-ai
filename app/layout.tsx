@@ -16,6 +16,13 @@ export const metadata: Metadata = {
     description: "Accurate Hinglish subtitles for any video in seconds.",
     type: "website",
   },
+  themeColor: "#02040A",
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+  },
 };
 
 export default function RootLayout({
