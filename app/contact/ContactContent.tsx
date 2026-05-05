@@ -5,7 +5,7 @@ import { Mail, MessageSquare, Globe, Send, Sparkles } from "lucide-react";
 
 export default function ContactContent() {
   return (
-    <div className="min-h-screen bg-[#080A11] relative overflow-hidden text-white">
+    <div className="min-h-screen bg-[#02040A] relative overflow-hidden text-white selection:bg-violet-500/30">
       <div className="bg-mesh" />
       
       <main className="max-w-6xl mx-auto px-6 py-20 relative z-10">

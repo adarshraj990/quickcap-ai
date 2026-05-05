@@ -8,7 +8,7 @@ export const metadata = {
 
 export default function Disclaimer() {
   return (
-    <div className="min-h-screen bg-[#080A11] relative overflow-hidden">
+    <div className="min-h-screen bg-[#02040A] relative overflow-hidden selection:bg-violet-500/30">
       <div className="bg-mesh" />
       
       <main className="max-w-4xl mx-auto px-6 py-20 relative z-10">
@@ -27,7 +27,7 @@ export default function Disclaimer() {
           </p>
 
           <div className="space-y-12">
-            <section className="glass-premium p-8 rounded-3xl border border-white/5">
+            <section className="glass-premium p-8 rounded-3xl">
               <div className="flex items-center gap-4 mb-6">
                 <div className="p-3 rounded-lg bg-violet-500/10 text-violet-400">
                   <Zap className="w-6 h-6" />
@@ -41,7 +41,7 @@ export default function Disclaimer() {
               </p>
             </section>
 
-            <section className="glass-premium p-8 rounded-3xl border border-white/5">
+            <section className="glass-premium p-8 rounded-3xl">
               <div className="flex items-center gap-4 mb-6">
                 <div className="p-3 rounded-lg bg-pink-500/10 text-pink-400">
                   <ShieldAlert className="w-6 h-6" />
@@ -53,10 +53,10 @@ export default function Disclaimer() {
               </p>
             </section>
 
-            <section className="glass-premium p-8 rounded-3xl border border-white/5">
+            <section className="glass-premium p-8 rounded-3xl">
               <div className="flex items-center gap-4 mb-6">
                 <div className="p-3 rounded-lg bg-cyan-500/10 text-cyan-400">
-                  <Info className="w-6 h-6" />
+                  <span className="w-6 h-6 flex items-center justify-center"><Info className="w-6 h-6" /></span>
                 </div>
                 <h2 className="text-2xl font-bold text-white">External Links</h2>
               </div>
@@ -65,7 +65,7 @@ export default function Disclaimer() {
               </p>
             </section>
 
-            <section className="glass-premium p-8 rounded-3xl border border-white/5">
+            <section className="glass-premium p-8 rounded-3xl">
               <div className="flex items-center gap-4 mb-6">
                 <div className="p-3 rounded-lg bg-blue-500/10 text-blue-400">
                   <AlertCircle className="w-6 h-6" />

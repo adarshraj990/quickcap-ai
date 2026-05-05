@@ -52,7 +52,7 @@ const POSTS = [
 
 export default function BlogListing() {
   return (
-    <div className="min-h-screen bg-[#080A11] relative overflow-hidden text-white">
+    <div className="min-h-screen bg-[#02040A] relative overflow-hidden text-white selection:bg-violet-500/30">
       <div className="bg-mesh" />
       
       <main className="max-w-6xl mx-auto px-6 py-20 relative z-10">
@@ -67,7 +67,7 @@ export default function BlogListing() {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {POSTS.map((post, i) => (
-            <article key={i} className="glass-premium rounded-[2.5rem] border border-white/5 overflow-hidden flex flex-col group hover:border-violet-500/30 transition-all">
+            <article key={i} className="glass-premium rounded-[2.5rem] overflow-hidden flex flex-col group hover:border-violet-500/30 transition-all duration-300">
               <div className="p-8 flex-1">
                 <div className="flex items-center gap-3 mb-4">
                   <span className="text-[10px] font-black uppercase tracking-widest text-violet-400 bg-violet-500/10 px-3 py-1 rounded-full">{post.category}</span>

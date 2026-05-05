@@ -8,7 +8,7 @@ export const metadata = {
 
 export default function TermsAndConditions() {
   return (
-    <div className="min-h-screen bg-[#080A11] relative overflow-hidden">
+    <div className="min-h-screen bg-[#02040A] relative overflow-hidden selection:bg-violet-500/30">
       <div className="bg-mesh" />
       
       <main className="max-w-4xl mx-auto px-6 py-20 relative z-10">
@@ -27,7 +27,7 @@ export default function TermsAndConditions() {
           </p>
 
           <div className="space-y-12">
-            <section className="glass-premium p-8 rounded-3xl border border-white/5">
+            <section className="glass-premium p-8 rounded-3xl">
               <div className="flex items-center gap-4 mb-6">
                 <div className="p-3 rounded-lg bg-violet-500/10 text-violet-400">
                   <CheckCircle className="w-6 h-6" />
@@ -46,7 +46,7 @@ export default function TermsAndConditions() {
               </div>
             </section>
 
-            <section className="glass-premium p-8 rounded-3xl border border-white/5">
+            <section className="glass-premium p-8 rounded-3xl">
               <div className="flex items-center gap-4 mb-6">
                 <div className="p-3 rounded-lg bg-pink-500/10 text-pink-400">
                   <AlertTriangle className="w-6 h-6" />
@@ -61,7 +61,7 @@ export default function TermsAndConditions() {
               </p>
             </section>
 
-            <section className="glass-premium p-8 rounded-3xl border border-white/5">
+            <section className="glass-premium p-8 rounded-3xl">
               <div className="flex items-center gap-4 mb-6">
                 <div className="p-3 rounded-lg bg-cyan-500/10 text-cyan-400">
                   <Scale className="w-6 h-6" />
@@ -73,7 +73,7 @@ export default function TermsAndConditions() {
               </p>
             </section>
 
-            <section className="glass-premium p-8 rounded-3xl border border-white/5">
+            <section className="glass-premium p-8 rounded-3xl">
               <div className="flex items-center gap-4 mb-6">
                 <div className="p-3 rounded-lg bg-blue-500/10 text-blue-400">
                   <Gavel className="w-6 h-6" />

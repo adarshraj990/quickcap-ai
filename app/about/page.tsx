@@ -51,7 +51,7 @@ const FAQS = [
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-[#080A11] relative overflow-hidden text-white">
+    <div className="min-h-screen bg-[#02040A] relative overflow-hidden text-white selection:bg-violet-500/30">
       <div className="bg-mesh" />
       
       <main className="max-w-5xl mx-auto px-6 py-20 relative z-10">
@@ -71,7 +71,7 @@ export default function AboutPage() {
 
         {/* Story Section */}
         <div className="grid md:grid-cols-2 gap-12 mb-32 items-center">
-          <div className="glass-premium p-10 rounded-[2.5rem] border border-white/5 animate-fade-up">
+          <div className="glass-premium p-10 rounded-[2.5rem] animate-fade-up">
             <h2 className="text-3xl font-black mb-6 flex items-center gap-3">
               Our <span className="text-violet-400">Mission</span>
             </h2>
@@ -113,7 +113,7 @@ export default function AboutPage() {
             {FAQS.map((faq, index) => (
               <div 
                 key={index} 
-                className="glass-premium p-8 rounded-3xl border border-white/5 hover:border-white/10 transition-all group"
+                className="glass-premium p-8 rounded-3xl group hover:scale-[1.02] transition-all duration-300"
               >
                 <h3 className="text-lg font-bold mb-3 flex items-start gap-3">
                   <span className="text-violet-500 font-black">0{index + 1}.</span>
@@ -128,7 +128,7 @@ export default function AboutPage() {
         </div>
 
         {/* CTA */}
-        <div className="text-center bg-gradient-to-br from-violet-600/20 to-fuchsia-600/20 rounded-[3rem] p-12 border border-white/10">
+        <div className="text-center bg-gradient-to-br from-violet-600/10 to-fuchsia-600/10 rounded-[3rem] p-12 border border-white/5">
           <h2 className="text-3xl font-black mb-4">Ready to reach more viewers?</h2>
           <p className="text-slate-400 mb-8">Join thousands of creators using QuickCap AI today.</p>
           <a href="/" className="btn-wow px-8 py-4 rounded-2xl font-black inline-flex items-center gap-2">

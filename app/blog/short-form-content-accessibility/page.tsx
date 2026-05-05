@@ -9,7 +9,7 @@ export const metadata = {
 
 export default function BlogPost() {
   return (
-    <div className="min-h-screen bg-[#080A11] text-white selection:bg-violet-500/30">
+    <div className="min-h-screen bg-[#02040A] text-white selection:bg-violet-500/30">
       <div className="bg-mesh" />
       <main className="max-w-4xl mx-auto px-6 py-20 relative z-10">
         <Link href="/blog" className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-12 group">
@@ -54,7 +54,7 @@ export default function BlogPost() {
             </p>
           </div>
           <footer className="mt-20 pt-10 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-8">
-            <Link href="/" className="btn-wow px-8 py-4 rounded-2xl font-black text-sm">Start Captioining for Free</Link>
+            <Link href="/" className="btn-wow px-8 py-4 rounded-2xl font-black text-sm">Start Captioning for Free</Link>
           </footer>
         </article>
       </main>

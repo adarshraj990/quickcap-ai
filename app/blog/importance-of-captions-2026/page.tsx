@@ -9,7 +9,7 @@ export const metadata = {
 
 export default function BlogPost() {
   return (
-    <div className="min-h-screen bg-[#080A11] text-white selection:bg-violet-500/30">
+    <div className="min-h-screen bg-[#02040A] text-white selection:bg-violet-500/30">
       <div className="bg-mesh" />
       
       <main className="max-w-4xl mx-auto px-6 py-20 relative z-10">
