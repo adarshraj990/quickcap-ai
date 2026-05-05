@@ -21,7 +21,12 @@ import {
   ArrowRight,
   Menu,
   ChevronRight,
-  Plus
+  Plus,
+  Play,
+  Type,
+  Palette,
+  Layout,
+  FileCode
 } from "lucide-react";
 import { DropZone } from "@/components/DropZone";
 import { ProgressBar } from "@/components/ProgressBar";
@@ -160,389 +165,325 @@ export default function Home() {
   const isProcessing = appState === "extracting" || appState === "transcribing";
 
   return (
-    <div className="min-h-screen bg-[#080A11] text-slate-200 selection:bg-violet-500/30">
-      <div className="bg-mesh" />
-
+    <div className="min-h-screen bg-[#02040A] text-slate-200 selection:bg-violet-500/30 font-sans">
+      
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-[#080A11]/80 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-transparent">
+        <div className="max-w-7xl mx-auto px-6 h-24 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center shadow-lg shadow-violet-500/20">
-              <Sparkles className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-2xl font-black text-white tracking-tighter">QuickCap AI</span>
+             <div className="w-8 h-8 flex items-center justify-center">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M10 6L24 16L10 26V6Z" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M6 4V28" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
+                </svg>
+             </div>
+             <span className="text-xl font-bold text-white">QuickCap AI</span>
           </div>
-          <div className="hidden md:flex items-center gap-8">
-            <a href="#why" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Why QuickCap?</a>
-            <a href="#how" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">How it Works</a>
-            <a href="#about" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">About</a>
-            <button 
-              onClick={scrollToTool}
-              className="px-6 py-2.5 rounded-full bg-white/5 border border-white/10 text-sm font-bold text-white hover:bg-white/10 transition-all"
-            >
-              Launch Tool
-            </button>
+          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-400">
+            <a href="#why" className="hover:text-white transition-colors">Products</a>
+            <a href="#how" className="hover:text-white transition-colors">How it Works</a>
+            <a href="#tool" className="hover:text-white transition-colors">Launch Tool</a>
           </div>
-          <button className="md:hidden p-2 text-slate-400">
-            <Menu className="w-6 h-6" />
-          </button>
+          <div className="flex items-center gap-4">
+             {/* Login/Signup removed */}
+          </div>
         </div>
       </nav>
 
       <main>
-        {/* Hero Section */}
-        <section className="relative pt-48 md:pt-60 pb-24 px-6 overflow-hidden">
-          <div className="max-w-7xl mx-auto text-center relative z-10">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-400 text-xs font-bold uppercase tracking-widest mb-8 animate-fade-up">
-              <Sparkles className="w-4 h-4" />
-              Revolutionizing Video Content
-            </div>
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white mb-8 tracking-tighter leading-[1.1] py-2 animate-fade-up" style={{ animationDelay: '0.1s' }}>
-              Your Content, <br />
-              <span className="text-gradient">Fully Subtitled.</span>
+        {/* Hero Section (Inspiration Top-Right) */}
+        <section className="relative min-h-screen flex flex-col items-center justify-center px-6 overflow-hidden bg-[#02040A]">
+          {/* Abstract Glowing Lines Background */}
+          <div className="absolute inset-0 z-0">
+             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] opacity-20">
+                <svg viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+                  <path d="M0,500 Q250,400 500,500 T1000,500" stroke="url(#line-grad)" strokeWidth="1" fill="none" className="animate-float" />
+                  <path d="M0,550 Q250,450 500,550 T1000,550" stroke="url(#line-grad)" strokeWidth="1" fill="none" className="animate-float" style={{ animationDelay: '1s' }} />
+                  <path d="M0,450 Q250,350 500,450 T1000,450" stroke="url(#line-grad)" strokeWidth="1" fill="none" className="animate-float" style={{ animationDelay: '2s' }} />
+                  <defs>
+                    <linearGradient id="line-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#8B5CF6" stopOpacity="0" />
+                      <stop offset="50%" stopColor="#EC4899" stopOpacity="1" />
+                      <stop offset="100%" stopColor="#06B6D4" stopOpacity="0" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+             </div>
+          </div>
+
+          <div className="max-w-7xl mx-auto text-center relative z-10 animate-fade-up">
+            <h1 className="text-5xl md:text-7xl lg:text-[5.5rem] font-black text-white mb-6 tracking-tight leading-[1.05]">
+              FAST, ACCURATE, PRIVATE <br />
+              AI CAPTIONS
             </h1>
-            <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-12 leading-relaxed animate-fade-up" style={{ animationDelay: '0.2s' }}>
-              The fastest way to generate accurate, high-engagement captions for your Reels, Shorts, and TikToks using state-of-the-art Whisper AI.
+            <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+              Fastest easy-to-use video captions moving locally
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-up" style={{ animationDelay: '0.3s' }}>
+            <div className="flex justify-center">
               <button 
                 onClick={scrollToTool}
-                className="btn-wow w-full sm:w-auto px-10 py-5 rounded-2xl font-black text-xl flex items-center justify-center gap-3"
+                className="group relative px-12 py-4 rounded-xl font-bold text-lg text-white transition-all overflow-hidden"
               >
-                Upload Video
-                <ArrowRight className="w-6 h-6" />
+                {/* Glowing Border & Gradient Background */}
+                <div className="absolute inset-0 bg-gradient-to-r from-violet-600 to-fuchsia-600 opacity-90 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute inset-0 blur-xl bg-violet-600/50 group-hover:bg-violet-600/70 transition-all scale-110" />
+                <span className="relative z-10 flex items-center gap-3">
+                   Upload Video
+                </span>
               </button>
             </div>
           </div>
-          
-          {/* Decorative Elements */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-violet-600/10 blur-[150px] rounded-full -z-10 animate-pulse" />
         </section>
 
-        {/* Welcome Section */}
-        <section className="py-32 px-6 border-y border-white/5 bg-[#0A0D16]/50">
-          <div className="max-w-5xl mx-auto text-center">
-            <h2 className="text-3xl md:text-5xl font-black text-white mb-16 tracking-tight leading-tight">
-              Congratulations! You've found the <span className="text-violet-400">fastest way</span> to add AI Captions.
-            </h2>
-            <div className="grid md:grid-cols-3 gap-8 text-left">
-              <div className="p-8 rounded-3xl bg-white/5 border border-white/5 hover:border-violet-500/20 transition-all">
-                <div className="w-12 h-12 rounded-2xl bg-violet-500/10 flex items-center justify-center mb-6">
-                  <Shield className="w-6 h-6 text-violet-400" />
-                </div>
-                <h3 className="text-xl font-bold text-white mb-3">Privacy-First</h3>
-                <p className="text-slate-400 text-sm leading-relaxed">
-                  Your videos never leave your browser. We only process audio tracks, ensuring 100% data security.
-                </p>
-              </div>
-              <div className="p-8 rounded-3xl bg-white/5 border border-white/5 hover:border-fuchsia-500/20 transition-all">
-                <div className="w-12 h-12 rounded-2xl bg-fuchsia-500/10 flex items-center justify-center mb-6">
-                  <Zap className="w-6 h-6 text-fuchsia-400" />
-                </div>
-                <h3 className="text-xl font-bold text-white mb-3">Audio-Only</h3>
-                <p className="text-slate-400 text-sm leading-relaxed">
-                  We extract audio locally, saving 90% bandwidth compared to traditional cloud-based captioning tools.
-                </p>
-              </div>
-              <div className="p-8 rounded-3xl bg-white/5 border border-white/5 hover:border-cyan-500/20 transition-all">
-                <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 flex items-center justify-center mb-6">
-                  <CheckCircle2 className="w-6 h-6 text-cyan-400" />
-                </div>
-                <h3 className="text-xl font-bold text-white mb-3">99% Accuracy</h3>
-                <p className="text-slate-400 text-sm leading-relaxed">
-                  Powered by Groq-accelerated Whisper AI, delivering near-perfect transcription in record time.
-                </p>
-              </div>
+        {/* How It Works Section (Inspiration Bottom-Left - Clean White Theme) */}
+        <section id="how" className="py-32 px-6 bg-[#F8FAFC]">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-24">
+              <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">'How It Works' Section</h2>
+              <p className="text-slate-500 font-medium tracking-tight uppercase text-sm">Simple a through Clean White Theme</p>
+            </div>
+            
+            <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-0">
+               {/* Step 1 */}
+               <div className="flex-1 flex flex-col items-center text-center max-w-[280px]">
+                  <div className="w-24 h-24 rounded-2xl bg-white shadow-xl shadow-slate-200/50 border border-slate-100 flex items-center justify-center mb-8">
+                     <div className="w-12 h-12 rounded-lg bg-slate-50 flex items-center justify-center border border-slate-100">
+                        <UploadCloud className="w-6 h-6 text-slate-400" />
+                     </div>
+                  </div>
+                  <span className="text-slate-400 font-bold text-sm mb-2">Step 1:</span>
+                  <h3 className="text-xl font-black text-slate-900 mb-3">Upload MP4/MOV</h3>
+                  <p className="text-slate-500 text-sm leading-relaxed px-4">Upload what your file browser</p>
+               </div>
+
+               {/* Arrow */}
+               <div className="hidden md:flex w-24 items-center justify-center pb-20">
+                  <div className="w-full h-[2px] bg-slate-200 relative">
+                     <div className="absolute -right-1 -top-1 w-2 h-2 border-t-2 border-r-2 border-slate-200 rotate-45" />
+                  </div>
+               </div>
+
+               {/* Step 2 */}
+               <div className="flex-1 flex flex-col items-center text-center max-w-[280px]">
+                  <div className="w-24 h-24 rounded-2xl bg-white shadow-xl shadow-slate-200/50 border border-slate-100 flex items-center justify-center mb-8">
+                     <span className="text-slate-900 font-black text-lg">Whisper</span>
+                  </div>
+                  <span className="text-slate-400 font-bold text-sm mb-2">Step 2:</span>
+                  <h3 className="text-xl font-black text-slate-900 mb-3">AI Process</h3>
+                  <p className="text-slate-500 text-sm leading-relaxed px-4">Extracting audio audio audio locally</p>
+               </div>
+
+               {/* Arrow */}
+               <div className="hidden md:flex w-24 items-center justify-center pb-20">
+                  <div className="w-full h-[2px] bg-slate-200 relative">
+                     <div className="absolute -right-1 -top-1 w-2 h-2 border-t-2 border-r-2 border-slate-200 rotate-45" />
+                  </div>
+               </div>
+
+               {/* Step 3 */}
+               <div className="flex-1 flex flex-col items-center text-center max-w-[280px]">
+                  <div className="w-24 h-24 rounded-2xl bg-white shadow-xl shadow-slate-200/50 border border-slate-100 flex items-center justify-center mb-8">
+                     <div className="flex flex-col items-center">
+                        <FileCode className="w-8 h-8 text-slate-400" />
+                        <span className="text-[10px] font-bold text-slate-400 mt-1 uppercase">SRT</span>
+                     </div>
+                  </div>
+                  <span className="text-slate-400 font-bold text-sm mb-2">Step 3:</span>
+                  <h3 className="text-xl font-black text-slate-900 mb-3">Review & Export</h3>
+                  <p className="text-slate-500 text-sm leading-relaxed px-4">Final video into your final video</p>
+               </div>
             </div>
           </div>
         </section>
 
-        {/* The Tool Section */}
-        <section ref={toolRef} id="tool" className="py-24 px-6 bg-[#080A11]">
+        {/* Editor Dashboard (Inspiration Top-Left) */}
+        <section ref={toolRef} id="tool" className="py-24 px-6 bg-white">
           <div className="max-w-7xl mx-auto">
-            <div className="mb-12 text-center">
-              <h2 className="text-3xl md:text-4xl font-black text-white mb-4">AI Captioning <span className="text-gradient">Dashboard</span></h2>
-              <p className="text-slate-400">Upload your video and watch the magic happen in seconds.</p>
+            {/* Header */}
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-12 gap-6">
+               <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center">
+                     <Layout className="w-6 h-6 text-slate-900" />
+                  </div>
+                  <h2 className="text-3xl font-black text-slate-900">Main Editor Dashboard</h2>
+               </div>
+               <div className="flex items-center gap-3 bg-slate-100 p-1.5 rounded-xl">
+                  <button className="px-6 py-2.5 rounded-lg text-sm font-bold text-slate-500 hover:text-slate-900 transition-colors">Settings</button>
+                  <button className="px-6 py-2.5 rounded-lg bg-slate-900 text-white text-sm font-bold shadow-lg shadow-slate-200">Dashboard</button>
+               </div>
             </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 max-w-[1400px] mx-auto">
-              {/* Left Column: Input */}
-              <div className="space-y-6 flex flex-col">
-                {/* Upload Video Card */}
-                <div className="glass-premium rounded-[2rem] p-8 flex flex-col min-h-[400px]">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="p-2 rounded-lg bg-violet-500/10">
-                      <UploadCloud className="w-5 h-5 text-violet-400" />
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+              {/* Left Column: Video Preview */}
+              <div className="lg:col-span-7 flex flex-col">
+                <div className="bg-[#121418] rounded-3xl overflow-hidden aspect-video relative group border border-slate-800 shadow-2xl">
+                  {appState === "idle" ? (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center p-8">
+                      <DropZone onFileSelect={handleFileSelect} disabled={isProcessing} />
                     </div>
-                    <h2 className="text-lg font-bold text-white">Upload Media</h2>
-                  </div>
-                  <div className="flex-1">
-                    <DropZone onFileSelect={handleFileSelect} disabled={isProcessing} />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black">
+                       {/* Placeholder for video player or processing state */}
+                       <div className="text-center text-slate-500 flex flex-col items-center gap-4">
+                          <Play className="w-16 h-16 opacity-20" />
+                          <p className="font-bold text-sm">Processing Video...</p>
+                       </div>
+                    </div>
+                  )}
+                  {/* Fake UI Overlay like the image */}
+                  <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent flex items-center justify-between pointer-events-none">
+                     <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center">
+                           <Play className="w-4 h-4 text-white fill-white" />
+                        </div>
+                        <div className="h-1.5 w-32 bg-white/20 rounded-full overflow-hidden">
+                           <div className="h-full w-1/3 bg-white" />
+                        </div>
+                     </div>
+                     <div className="text-white/60 text-[10px] font-mono">0:00 / 0:15</div>
                   </div>
                 </div>
 
-                {/* Settings Card */}
-                <div className="glass-premium rounded-[2rem] p-8">
-                  <div className="flex items-center gap-3 mb-8">
-                    <div className="p-2 rounded-lg bg-fuchsia-500/10">
-                      <Settings className="w-5 h-5 text-fuchsia-400" />
-                    </div>
-                    <h2 className="text-lg font-bold text-white">Settings</h2>
-                  </div>
-                  
-                  <div className="space-y-6">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <div>
-                        <label className="text-sm font-bold text-slate-300">Input Language</label>
-                        <p className="text-xs text-slate-500">Language spoken in the video</p>
-                      </div>
-                      <select
-                        value={selectedLanguage}
-                        onChange={(e) => setSelectedLanguage(e.target.value)}
-                        className="w-full sm:w-64 bg-[#090C15] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-violet-500 outline-none appearance-none"
-                      >
-                        {LANGUAGES.map((lang) => (
-                          <option key={lang.code} value={lang.code} className="bg-[#0D111C]">{lang.name}</option>
-                        ))}
-                      </select>
-                    </div>
-                    
-                    <div className="flex items-center justify-between py-4 border-t border-white/5">
-                      <div>
-                        <label className="text-sm font-bold text-slate-300">Translate Subtitles</label>
-                        <p className="text-xs text-slate-500">Automatically translate output</p>
-                      </div>
-                      <button
-                        onClick={() => setIsTranslateEnabled(!isTranslateEnabled)}
-                        className={`relative inline-flex h-7 w-12 items-center rounded-full transition-all focus:outline-none ${isTranslateEnabled ? 'bg-violet-500' : 'bg-white/10'}`}
-                      >
-                        <span className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform shadow-sm ${isTranslateEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
-                      </button>
-                    </div>
-
-                    {isTranslateEnabled && (
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-white/5 animate-fade-up">
-                        <div>
-                          <label className="text-sm font-bold text-slate-300">Target Language</label>
-                        </div>
-                        <select
-                          value={targetLanguage}
-                          onChange={(e) => setTargetLanguage(e.target.value)}
-                          className="w-full sm:w-64 bg-[#090C15] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-violet-500 outline-none appearance-none"
-                        >
-                          {LANGUAGES.filter(l => l.code !== 'auto' && l.code !== 'hinglish').map((lang) => (
-                            <option key={lang.code} value={lang.code} className="bg-[#0D111C]">{lang.name}</option>
-                          ))}
-                        </select>
-                      </div>
-                    )}
-
-                    <div className="pt-6 border-t border-white/5">
-                      <button
-                        onClick={handleProcess}
-                        disabled={!mediaFile || isProcessing || appState === "done"}
-                        className="btn-wow w-full py-4 rounded-xl font-bold flex items-center justify-center gap-3 text-lg"
-                      >
-                        <Sparkles className="w-5 h-5" />
-                        {isProcessing ? "Processing..." : "Generate Captions"}
-                      </button>
-                    </div>
-
-                    {isProcessing && (
-                      <div className="mt-6 p-6 rounded-2xl bg-violet-500/5 border border-violet-500/10 space-y-6">
-                        <ProgressBar
-                          label="Local Extraction"
-                          progress={progress.extractProgress}
-                          color={appState === "extracting" ? "secondary" : "success"}
-                        />
-                        <ProgressBar
-                          label="AI Transcription"
-                          progress={progress.transcribeProgress}
-                          color="primary"
-                          message={progress.stage}
-                        />
-                      </div>
-                    )}
-                    
-                    {appState === "error" && (
-                      <div className="mt-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <AlertCircle className="w-4 h-4" />
-                          <span>{error}</span>
-                        </div>
-                        <button onClick={handleReset} className="font-bold underline hover:text-red-300">Reset</button>
-                      </div>
-                    )}
-                  </div>
+                {/* Subtitle Display Simulation */}
+                <div className="mt-8 p-6 bg-slate-50 border border-slate-200 rounded-2xl">
+                   <p className="text-slate-400 text-sm italic font-medium">The video plate misses his noshrangatily speed and love it to captine.</p>
                 </div>
               </div>
 
-              {/* Right Column: Output */}
-              <div className="flex flex-col">
-                {appState === "done" && mediaFile ? (
-                  <CaptionList 
-                    segments={segments} 
-                    mediaFile={mediaFile} 
-                    onUpdateSegments={setSegments} 
-                    onReset={handleReset}
-                  />
-                ) : (
-                  <div className="glass-premium rounded-[2rem] p-8 h-full flex flex-col">
-                    <div className="flex items-center justify-between mb-8">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-lg bg-cyan-500/10">
-                          <Film className="w-5 h-5 text-cyan-400" />
-                        </div>
-                        <h2 className="text-lg font-bold text-white">Preview & Output</h2>
+              {/* Right Column: Style & Captions */}
+              <div className="lg:col-span-5 flex flex-col gap-6">
+                {/* Style Controls Card */}
+                <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+                   <div className="flex items-center justify-between mb-6">
+                      <h3 className="font-black text-slate-900">Style</h3>
+                   </div>
+                   <div className="grid grid-cols-3 gap-6">
+                      <div className="space-y-2">
+                         <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Font</label>
+                         <select className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 outline-none">
+                            <option>Anton</option>
+                            <option>Inter</option>
+                            <option>Roboto</option>
+                         </select>
                       </div>
-                    </div>
-                    <div className="flex-1 border-2 border-dashed border-white/5 rounded-[1.5rem] bg-[#090C15]/50 flex flex-col items-center justify-center text-slate-500 gap-4 min-h-[500px]">
-                      <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center">
-                        <FileText className="w-10 h-10 opacity-20" />
+                      <div className="space-y-2">
+                         <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center block">Color</label>
+                         <div className="flex justify-center">
+                            <div className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-200 flex items-center justify-center">
+                               <Palette className="w-4 h-4 text-white" />
+                            </div>
+                         </div>
                       </div>
-                      <p className="text-sm font-medium">Your captions will appear here</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Why QuickCap Section */}
-        <section id="why" className="py-24 px-6 bg-gradient-to-b from-[#080A11] to-[#0A0D16]">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-20">
-              <h2 className="text-4xl md:text-6xl font-black text-white mb-6">Why <span className="text-gradient">QuickCap?</span></h2>
-              <p className="text-slate-400 text-lg max-w-2xl mx-auto">The ultimate tool for modern creators who value speed, privacy, and quality.</p>
-            </div>
-            <div className="grid md:grid-cols-3 gap-8">
-              {[
-                { 
-                  icon: Shield, 
-                  title: "Privacy", 
-                  color: "violet",
-                  desc: "We process everything in your browser. Your private videos never leave your local machine, ever." 
-                },
-                { 
-                  icon: Zap, 
-                  title: "Speed", 
-                  color: "fuchsia",
-                  desc: "By only uploading the audio track, we speed up the process by 10x compared to traditional tools." 
-                },
-                { 
-                  icon: CheckCircle2, 
-                  title: "Accuracy", 
-                  color: "cyan",
-                  desc: "Groq's LPU technology combined with Whisper Large-v3 ensures industry-leading transcription accuracy." 
-                }
-              ].map((card, i) => (
-                <div key={i} className="group p-10 rounded-[2.5rem] bg-white/5 border border-white/5 hover:bg-white/[0.07] hover:border-white/10 transition-all duration-500">
-                  <div className={`w-16 h-16 rounded-2xl bg-${card.color}-500/10 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-500`}>
-                    <card.icon className={`w-8 h-8 text-${card.color}-400`} />
-                  </div>
-                  <h3 className="text-2xl font-black text-white mb-4">{card.title}</h3>
-                  <p className="text-slate-400 leading-relaxed">{card.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* How it Works Section */}
-        <section id="how" className="py-24 px-6 bg-[#0A0D16]">
-          <div className="max-w-7xl mx-auto">
-            <div className="flex flex-col lg:flex-row items-center gap-20">
-              <div className="lg:w-1/2">
-                <h2 className="text-4xl md:text-6xl font-black text-white mb-8 tracking-tighter">
-                  From Video to <br />
-                  <span className="text-gradient">Viral in 3 Steps.</span>
-                </h2>
-                <p className="text-slate-400 text-lg mb-12">We've simplified the captioning workflow so you can focus on creating content, not editing subtitles.</p>
-                
-                <div className="space-y-8">
-                  {[
-                    { step: "01", title: "Upload Video", desc: "Select your MP4 or MOV file. Our engine extracts the audio locally in milliseconds." },
-                    { step: "02", title: "AI Magic", desc: "Groq's lightning-fast AI generates accurate transcriptions and handles translations." },
-                    { step: "03", title: "Review & Export", desc: "Download professional .SRT or .VTT files ready for any social platform." }
-                  ].map((step, i) => (
-                    <div key={i} className="flex gap-6 group">
-                      <div className="shrink-0 w-14 h-14 rounded-full bg-white/5 border border-white/10 flex items-center justify-center font-black text-xl text-violet-400 group-hover:bg-violet-500 group-hover:text-white transition-all duration-300">
-                        {step.step}
+                      <div className="space-y-2">
+                         <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center block">Background</label>
+                         <div className="flex items-center justify-center gap-2">
+                            <div className="w-8 h-8 rounded-lg bg-slate-900" />
+                            <div className="flex flex-col gap-1">
+                               <div className="w-3 h-3 bg-slate-200 rounded-sm" />
+                               <div className="w-3 h-3 bg-slate-200 rounded-sm opacity-50" />
+                            </div>
+                         </div>
                       </div>
-                      <div>
-                        <h4 className="text-xl font-bold text-white mb-2">{step.title}</h4>
-                        <p className="text-slate-400 leading-relaxed">{step.desc}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="lg:w-1/2 relative">
-                <div className="aspect-square rounded-[4rem] bg-gradient-to-br from-violet-600/20 to-fuchsia-600/20 border border-white/5 flex items-center justify-center overflow-hidden animate-float">
-                   <div className="text-center p-12">
-                      <div className="relative inline-block mb-8">
-                        <Sparkles className="w-24 h-24 text-violet-400 opacity-50" />
-                        <div className="absolute inset-0 blur-2xl bg-violet-500/20 rounded-full" />
-                      </div>
-                      <p className="text-2xl font-black text-slate-300 italic max-w-sm">"The fastest captioning experience on the web."</p>
                    </div>
                 </div>
-                {/* Background Glows */}
-                <div className="absolute -top-20 -right-20 w-80 h-80 bg-violet-600/20 blur-[120px] rounded-full" />
-                <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-fuchsia-600/20 blur-[120px] rounded-full" />
+
+                {/* Caption List/Settings */}
+                <div className="flex-1 min-h-[400px] flex flex-col">
+                   {appState === "done" ? (
+                      <CaptionList 
+                        segments={segments} 
+                        mediaFile={mediaFile!} 
+                        onUpdateSegments={setSegments} 
+                        onReset={handleReset}
+                      />
+                   ) : (
+                      <div className="flex-1 bg-white border border-slate-200 rounded-3xl p-6 flex flex-col">
+                         <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-100">
+                            <div className="flex items-center gap-3">
+                               <Settings className="w-4 h-4 text-slate-400" />
+                               <span className="font-bold text-slate-900 text-sm">Transcription Settings</span>
+                            </div>
+                         </div>
+
+                         <div className="space-y-6 mb-8">
+                            <div className="space-y-2">
+                               <label className="text-xs font-bold text-slate-500">Language</label>
+                               <select
+                                 value={selectedLanguage}
+                                 onChange={(e) => setSelectedLanguage(e.target.value)}
+                                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-900 outline-none"
+                               >
+                                 {LANGUAGES.map((lang) => (
+                                   <option key={lang.code} value={lang.code}>{lang.name}</option>
+                                 ))}
+                               </select>
+                            </div>
+                            
+                            <div className="flex items-center justify-between">
+                               <span className="text-xs font-bold text-slate-500">Translate Output</span>
+                               <button
+                                 onClick={() => setIsTranslateEnabled(!isTranslateEnabled)}
+                                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all ${isTranslateEnabled ? 'bg-slate-900' : 'bg-slate-200'}`}
+                               >
+                                 <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isTranslateEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
+                               </button>
+                            </div>
+
+                            {isTranslateEnabled && (
+                               <div className="space-y-2 animate-fade-up">
+                                  <label className="text-xs font-bold text-slate-500">Target Language</label>
+                                  <select
+                                    value={targetLanguage}
+                                    onChange={(e) => setTargetLanguage(e.target.value)}
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-900 outline-none"
+                                  >
+                                    {LANGUAGES.filter(l => l.code !== 'auto' && l.code !== 'hinglish').map((lang) => (
+                                      <option key={lang.code} value={lang.code}>{lang.name}</option>
+                                    ))}
+                                  </select>
+                               </div>
+                            )}
+                         </div>
+
+                         <button
+                           onClick={handleProcess}
+                           disabled={!mediaFile || isProcessing}
+                           className="w-full bg-slate-900 hover:bg-slate-800 text-white py-4 rounded-2xl font-black text-lg transition-all shadow-xl shadow-slate-200 disabled:opacity-50 mt-auto"
+                         >
+                           {isProcessing ? "Processing..." : "Generate AI Captions"}
+                         </button>
+
+                         {isProcessing && (
+                            <div className="mt-6 space-y-4">
+                               <ProgressBar label="Extraction" progress={progress.extractProgress} color="secondary" />
+                               <ProgressBar label="Transcription" progress={progress.transcribeProgress} color="primary" />
+                            </div>
+                         )}
+                      </div>
+                   )}
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* About Section: SEO Content */}
-        <section id="about" className="py-24 px-6 bg-gradient-to-b from-[#0A0D16] to-[#080A11] border-t border-white/5">
-          <div className="max-w-4xl mx-auto prose prose-invert prose-violet">
-            <h2 className="text-3xl md:text-5xl font-black text-white mb-12 text-center tracking-tighter">
-              The Power of <span className="text-gradient">AI Captioning</span>
-            </h2>
-            
-            <div className="space-y-8 text-slate-400 leading-relaxed">
-              <p className="text-lg">
-                In the fast-paced world of short-form video, capturing attention in the first three seconds is the difference between a viral hit and a forgotten post. As platforms like Instagram Reels, YouTube Shorts, and TikTok continue to dominate the digital landscape, creators are constantly searching for ways to boost engagement and reach wider audiences. One of the most effective, yet often overlooked, strategies is the implementation of high-quality, accurate AI captions.
-              </p>
-
-              <h3 className="text-2xl font-bold text-white pt-4">The Silent Scroll Phenomenon</h3>
-              <p>
-                Statistics show that up to 80% of social media users browse their feeds with the sound turned off. Whether they are in a quiet office, on public transport, or simply prefer a silent experience, these users rely entirely on visual cues to understand your content. If your video doesn't have subtitles, you are essentially excluding a massive portion of your potential audience. AI captioning bridge this gap, ensuring your message is delivered clearly, regardless of whether the audio is playing.
-              </p>
-
-              <h3 className="text-2xl font-bold text-white pt-4">Boosting Engagement and Retention</h3>
-              <p>
-                Captions don't just help people understand your video; they keep them watching longer. Subtitles create a multi-sensory experience where the viewer is both hearing (if the sound is on) and reading your words. This dual-channel processing has been proven to increase information retention and viewer satisfaction. When users can follow along easily, they are more likely to watch the video until the end, which signals to the platform's algorithm that your content is high-value, leading to more organic reach.
-              </p>
-
-              <h3 className="text-2xl font-bold text-white pt-4">SEO Benefits of Video Transcription</h3>
-              <p>
-                While search engines can't "watch" your video in the traditional sense, they can index text. By generating captions and transcriptions, you are providing search engines with rich metadata about your content. This improves your visibility in search results for specific keywords related to your niche. AI captioning tools like QuickCap AI use advanced Whisper models to provide near-perfect accuracy, ensuring that your SEO keywords are captured correctly and contribute to your growth.
-              </p>
-
-              <h3 className="text-2xl font-bold text-white pt-4">Accessibility and Global Reach</h3>
-              <p>
-                Inclusion is a vital part of modern content creation. Captions make your videos accessible to the deaf and hard-of-hearing community, showing that you value all members of your audience. Furthermore, for creators targeting a global audience, subtitles are essential. Many viewers may speak your language as a second or third language; having text to accompany the speech helps them grasp nuances and follow complex topics more easily.
-              </p>
-
-              <h3 className="text-2xl font-bold text-white pt-4">Speed and Efficiency for Creators</h3>
-              <p>
-                Traditionally, captioning a video was a tedious, manual process that took hours of painstaking work. For a creator posting daily Reels or Shorts, this was unsustainable. QuickCap AI revolutionizes this workflow by leveraging cutting-edge AI to generate captions in seconds. Our privacy-first, browser-based approach means your videos are processed locally, saving you time and bandwidth while maintaining the highest levels of data security.
-              </p>
-
-              <div className="mt-16 p-10 rounded-[2.5rem] bg-violet-600/10 border border-violet-500/20 text-center">
-                <h4 className="text-2xl font-black text-white mb-4">Start Trending with QuickCap AI</h4>
-                <p className="mb-8">In the competitive arena of social media, every advantage counts. AI captions are no longer a "nice-to-have" feature; they are a fundamental requirement for growth.</p>
-                <button 
-                  onClick={scrollToTool}
-                  className="btn-wow px-10 py-4 rounded-2xl font-bold text-lg"
-                >
-                  Generate Free AI Captions Now
-                </button>
-              </div>
+        {/* Why QuickCap Section (Retaining for SEO) */}
+        <section id="why" className="py-24 px-6 bg-white border-t border-slate-100">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid md:grid-cols-3 gap-12">
+              {[
+                { icon: Shield, title: "Private", desc: "We process everything in your browser. Your videos never leave your local machine." },
+                { icon: Zap, title: "Speed", desc: "By only uploading the audio track, we speed up the process by 10x." },
+                { icon: CheckCircle2, title: "Accuracy", desc: "Groq's LPU technology combined with Whisper Large-v3 ensures accuracy." }
+              ].map((card, i) => (
+                <div key={i} className="flex flex-col items-center text-center">
+                  <div className="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center mb-6 text-slate-900">
+                    <card.icon className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-lg font-black text-slate-900 mb-2">{card.title}</h3>
+                  <p className="text-slate-500 text-sm leading-relaxed">{card.desc}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
